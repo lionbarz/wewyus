@@ -21,6 +21,9 @@
                     <label>
                         <input type="checkbox" ng-model="displayMyStatuses"> Show mine
                     </label>
+                    <label>
+                        <input type="checkbox" ng-model="displaySortByDay" ng-change="changeSort()"> Show by day
+                    </label>
                 </div>
                 <div class="send-status-box text-center" ng-show="isSendingStatus">
                     Sending...
@@ -33,7 +36,7 @@
                         {{status.text}}
                     </div>
                     <div class="status-date" ng-click="bumpDateIndex()">
-                        {{status.createDates[dateIndex]}}
+                        {{status.createFormattedDates[dateIndex]}}
                     </div>
                 </div>
             </div>

@@ -20,6 +20,7 @@ app.controller('StatusCtrl', function ($scope, $http) {
     $scope.isLoading = false;
     $scope.dateIndex = 0;
     $scope.displayMyStatuses = true;
+    $scope.displaySortByDay = false;
 
     $http.get("/api/Lover").success(function (data, status, headers, config) {
         $scope.loverName = data.name;
@@ -65,21 +66,49 @@ app.controller('StatusCtrl', function ($scope, $http) {
         var status,
             mom,
             fromNow,
-            dateMyTz,
-            dateMyLoverTz;
+            dateLocalToCreator,
+            dateLocalToLover;
+
+        var formatString = "dddd, MMM Do, h:mm a";
 
         for (i in $scope.statuses)
         {
             status = $scope.statuses[i];
-            mom = moment(status.dateCreated + "Z");
+            mom = moment(status.dateCreatedUtc + "Z"); 
             fromNow = mom.fromNow();
-            dateMyTz = mom.tz('America/Los_Angeles').format("dddd, MMM Do, h:mm a") + " (Seattle)";
-            dateMyLoverTz = mom.tz('Asia/Beirut').format("dddd, MMM Do, h:mm a") + " (Beirut)";
-            status.createDates = [fromNow, dateMyTz, dateMyLoverTz];
+            dateLocalToCreator = moment(status.dateCreatedCreator).format(formatString) + " (" + status.creatorCity + ")";
+            dateLocalToLover = moment(status.dateCreatedLover).format(formatString) + " (" + status.loverCity + ")";
+            status.createFormattedDates = [fromNow, dateLocalToCreator, dateLocalToLover];
         }
     };
 
     $scope.bumpDateIndex = function () {
         $scope.dateIndex = ($scope.dateIndex + 1) % 3;
+    }
+
+    $scope.changeSort = function () {
+        if ($scope.displaySortByDay)
+        {
+            // Sort by local time.
+            sortFunction = function (a, b) {
+                return (new Date(b.dateCreatedCreator)) - (new Date(a.dateCreatedCreator));
+            };
+
+            // Show in time local to creator.
+            $scope.dateIndex = 1;
+        }
+        else
+        {
+            sortFunction = function (a, b) {
+                return (new Date(b.dateCreatedUtc)) - (new Date(a.dateCreatedUtc));
+            };
+
+            // Show in relative time.
+            $scope.dateIndex = 0;
+        }
+
+        $scope.statuses.sort(sortFunction);
+
+        
     }
 });

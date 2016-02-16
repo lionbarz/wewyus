@@ -20,6 +20,7 @@ app.controller('StatusCtrl', function ($scope, $http) {
     $scope.isLoading = false;
     $scope.dateIndex = 0;
     $scope.displayMyStatuses = true;
+    $scope.displaySortByDay = false;
 
     $http.get("/api/Lover").success(function (data, status, headers, config) {
         $scope.loverName = data.name;
@@ -77,11 +78,37 @@ app.controller('StatusCtrl', function ($scope, $http) {
             fromNow = mom.fromNow();
             dateLocalToCreator = moment(status.dateCreatedCreator).format(formatString) + " (" + status.creatorCity + ")";
             dateLocalToLover = moment(status.dateCreatedLover).format(formatString) + " (" + status.loverCity + ")";
-            status.createDates = [fromNow, dateLocalToCreator, dateLocalToLover];
+            status.createFormattedDates = [fromNow, dateLocalToCreator, dateLocalToLover];
         }
     };
 
     $scope.bumpDateIndex = function () {
         $scope.dateIndex = ($scope.dateIndex + 1) % 3;
+    }
+
+    $scope.changeSort = function () {
+        if ($scope.displaySortByDay)
+        {
+            // Sort by local time.
+            sortFunction = function (a, b) {
+                return (new Date(b.dateCreatedCreator)) - (new Date(a.dateCreatedCreator));
+            };
+
+            // Show in time local to creator.
+            $scope.dateIndex = 1;
+        }
+        else
+        {
+            sortFunction = function (a, b) {
+                return (new Date(b.dateCreatedUtc)) - (new Date(a.dateCreatedUtc));
+            };
+
+            // Show in relative time.
+            $scope.dateIndex = 0;
+        }
+
+        $scope.statuses.sort(sortFunction);
+
+        
     }
 });

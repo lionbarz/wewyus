@@ -74,8 +74,6 @@ c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\bin\System.Web.
 c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\bin\System.Web.WebPages.Razor.xml
 c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.dll
 c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.pdb
-C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.InitialCreate.resources
-C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.Relationship.resources
-C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.Status.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.csproj.GenerateResource.Cache
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.csprojResolveAssemblyReference.cache
+C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.init.resources
