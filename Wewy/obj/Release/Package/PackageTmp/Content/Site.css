@@ -1,0 +1,80 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set padding to display errors that occur during databinding */
+.padding-error {
+    padding-top: 20px;
+}
+
+@media only screen and (max-width: 767px) {
+    .nofloat {
+        float: none;
+        padding: 10px 15px;
+    }
+}
+
+.status-date {
+    text-align: center;
+    width: 100%;
+}
+
+.status-text {
+    width: 100%;
+    border-radius: 10px;
+    background-color: gainsboro;
+    color: black;
+    padding: 10px;
+}
+
+.new-status-box {
+    margin-bottom: 10px;
+}
+
+.my-status-text {
+    background-color: cornflowerblue;
+}
+
+.status-box {
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.send-status-box, .reload-status-box {
+    background-image: url(/Resources/spinner.gif);
+    background-repeat: no-repeat;
+    height: 50px;
+    width: 150px;
+    margin: 0 auto;
+}
+
+.ng-view-loading {
+    width: 150px;
+    height: 50px;
+    margin: 20px auto;
+    background-image: url(/Resources/spinner.gif);
+    background-repeat: no-repeat;
+}
+
+@media screen and (min-width: 620px) {
+    .status-container {
+        width: 600px;
+        margin: auto;
+    }
+}

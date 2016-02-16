@@ -1,0 +1,42 @@
+﻿<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="status-container col-md-12">
+                <div ng-click="reload()">
+                    <h1>
+                        I ❤ {{loverName}}
+                    </h1>
+                </div>
+                <div class="new-status-box" ng-show="!isSendingStatus">
+                    <form ng-submit="submitNewStatus()">
+                        <div class="input-group">
+                            <input class="form-control" type="text" ng-model="newStatusText" placeholder="What am I doing right now?" />
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" ng-model="displayMyStatuses"> Show mine
+                    </label>
+                </div>
+                <div class="send-status-box text-center" ng-show="isSendingStatus">
+                    Sending...
+                </div>
+                <div class="reload-status-box text-center" ng-show="isLoading">
+                    Refreshing...
+                </div>
+                <div class="status-box" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
+                    <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">
+                        {{status.text}}
+                    </div>
+                    <div class="status-date" ng-click="bumpDateIndex()">
+                        {{status.createDates[dateIndex]}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Wewy - Status";
+}
+
+<div id="bodyContainer" ng-app="WewyApp">
+    <div class="ng-view">
+        <div class="ng-view-loading text-center">
+            Lahza ...
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/Scripts/moment.min.js")
+    @Scripts.Render("~/Scripts/moment-timezone-with-data-2010-2020.min.js")
+    @Scripts.Render("~/Scripts/angular-route.min.js")
+    @Scripts.Render("~/Scripts/app/wewy.js")
+}
