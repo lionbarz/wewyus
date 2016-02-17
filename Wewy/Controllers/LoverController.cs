@@ -36,7 +36,7 @@ namespace Wewy.Controllers
 
             UIUser user = new UIUser()
             {
-                Name = lover.UserName.Split(' ').First(),
+                Name = lover.Nickname ?? "?",
                 Email = lover.Email
             };
 
