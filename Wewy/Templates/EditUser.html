@@ -1,0 +1,15 @@
+﻿<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Your Settings</h1>
+                <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
+                Your city 
+                <select ng-model="cityName">
+                    <option ng-repeat="city in cities">{{city}}</option>
+                </select>
+                <button ng-click="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</section>

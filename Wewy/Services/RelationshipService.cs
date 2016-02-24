@@ -21,5 +21,11 @@ namespace Wewy.Services
             
             return relationship;
         }
+
+        public async Task<ApplicationUser> GetLover(string userId)
+        {
+            var relationship = await GetUserRelationshipIdAsync(userId);
+            return (relationship.FirstId == userId) ? relationship.Second : relationship.First;
+        }
     }
 }

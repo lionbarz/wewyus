@@ -7,20 +7,51 @@ app.config(['$routeProvider',
             templateUrl: 'templates/Status.html',
             controller: 'StatusCtrl'
         }).
+        when('/EditUser', {
+            templateUrl: 'templates/EditUser.html',
+            controller: 'EditUserCtrl'
+        }).
         otherwise({
             redirectTo: '/Status'
         });
   }]);
 
+app.controller('EditUserCtrl', function ($scope, $http, $window) {
+
+    $scope.cities = [];
+    $scope.isSaving = false;
+    $scope.alert = "";
+
+    $http.get("/api/City").success(function (data, status, headers, config) {
+        $scope.cities = data;
+    }).error(function (data, status, headers, config) {
+        $scope.alert = "Oops... something went wrong";
+        $scope.working = false;
+    });
+
+    $scope.save = function () {
+        $scope.isSaving = true;
+        $scope.alert = "Saving...";
+        $http.put("/api/User", { "cityName": $scope.cityName }).success(function (data, status, headers, config) {
+            $window.location.href = '/#Status';
+            $scope.isSaving = false;
+        }).error(function (data, status, headers, config) {
+            $scope.isSaving = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+});
+
 app.controller('StatusCtrl', function ($scope, $http) {
     var dad = 1;
-    $scope.loverName = "?"
-    $scope.title = "Your lover is " + $scope.loverName;
     $scope.isSendingStatus = false;
     $scope.isLoading = false;
     $scope.dateIndex = 0;
     $scope.displayMyStatuses = true;
     $scope.displaySortByDay = false;
+    $scope.myUserData = null;
+    $scope.loverUserData = null;
 
     $http.get("/api/Lover").success(function (data, status, headers, config) {
         $scope.loverName = data.name;
@@ -41,8 +72,6 @@ app.controller('StatusCtrl', function ($scope, $http) {
             $scope.working = false;
         });
     };
-
-    $scope.reload();
 
     $scope.submitNewStatus = function () {
         var text = $scope.newStatusText;
@@ -107,8 +136,20 @@ app.controller('StatusCtrl', function ($scope, $http) {
             $scope.dateIndex = 0;
         }
 
-        $scope.statuses.sort(sortFunction);
-
-        
+        $scope.statuses.sort(sortFunction);        
     }
+
+    $scope.getUserData = function () {
+        $http.get("/api/User").success(function (data, status, headers, config) {
+            $scope.me = data.me;
+            $scope.lover = data.lover;          
+        }).error(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.title = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    }
+
+    $scope.reload();
+    $scope.getUserData();
 });

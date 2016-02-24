@@ -1,18 +1,32 @@
 ﻿<section id="content">
-    <div class="container">
-        <div class="row">
-            <div class="status-container col-md-12">
-                <div ng-click="reload()">
-                    <h1>
-                        I ❤ {{loverName}}
-                    </h1>
+    <div class="container status-container">
+        <div class="row user-row" ng-click="reload()">
+            <div class="col-xs-12 user-col">       
+                <div class="user-city-info" ng-style="me.cityName && {'background-image':'url(/resources/'+me.cityName.toLowerCase()+'.jpg)'}">
+                    <p class="user-name">{{me.name}}</p>
+                    <p>{{me.cityName}}</p>
                 </div>
+            </div>
+        </div>
+        <div class="row user-row" ng-click="reload()">
+            <div class="col-xs-12 text-center heart">❤</div>
+        </div>
+        <div class="row user-row" ng-click="reload()">
+            <div class="col-xs-12 user-col">
+                <div class="user-city-info" ng-style="lover.cityName && {'background-image':'url(/resources/'+lover.cityName.toLowerCase()+'.jpg)'}">
+                    <p class="user-name">{{lover.name}}</p>
+                    <p>{{lover.cityName}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
                 <div class="new-status-box" ng-show="!isSendingStatus">
                     <form ng-submit="submitNewStatus()">
                         <div class="input-group">
-                            <input class="form-control" type="text" ng-model="newStatusText" placeholder="What am I doing right now?" />
+                            <input class="form-control" type="text" ng-model="newStatusText" placeholder="What am I doing?" />
                             <div class="input-group-btn">
-                                <button class="btn btn-default" type="submit">Submit</button>
+                                <button class="btn btn-default" type="submit">Ya2</button>
                             </div>
                         </div>
                     </form>
