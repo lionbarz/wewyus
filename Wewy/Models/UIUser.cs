@@ -10,5 +10,6 @@ namespace Wewy.Models
         public string Name { get; set; }
         public string Email { get; set; }
         public string CityName { get; set; }
+        public string TimeZoneName { get; set; }
     }
 }

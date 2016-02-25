@@ -78,7 +78,6 @@
 }
 
 .user-row {
-    margin-top: 5px;
     margin-bottom: 5px;
 }
 
@@ -97,12 +96,12 @@ div .user-city-info {
 
 .user-city-info p {
     color: white;
-    margin: 14px 10px;
+    margin: 0 0 0 5px;
 }
 
 .user-city-info .user-name {
-    font-size: large;
     font-weight: bold;
+    margin: 5px 0 0 5px;
 }
 
 .heart {

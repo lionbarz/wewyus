@@ -33,13 +33,15 @@ namespace Wewy.Controllers
                 {
                     Name = me.Nickname,
                     Email = me.Email,
-                    CityName = me.CurrentCity.Name
+                    CityName = me.CurrentCity.Name,
+                    TimeZoneName = me.CurrentCity.UserTimeZone.Name
                 },
                 Lover = new UIUser()
                 {
                     Name = lover.Nickname,
                     Email = lover.Email,
-                    CityName = lover.CurrentCity.Name
+                    CityName = lover.CurrentCity.Name,
+                    TimeZoneName = lover.CurrentCity.UserTimeZone.Name
                 }
             };
 

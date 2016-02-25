@@ -43,7 +43,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
     };
 });
 
-app.controller('StatusCtrl', function ($scope, $http) {
+app.controller('StatusCtrl', function ($scope, $http, $interval) {
     var dad = 1;
     $scope.isSendingStatus = false;
     $scope.isLoading = false;
@@ -107,9 +107,20 @@ app.controller('StatusCtrl', function ($scope, $http) {
             fromNow = mom.fromNow();
             dateLocalToCreator = moment(status.dateCreatedCreator).format(formatString) + " (" + status.creatorCity + ")";
             dateLocalToLover = moment(status.dateCreatedLover).format(formatString) + " (" + status.loverCity + ")";
-            status.createFormattedDates = [fromNow, dateLocalToCreator, dateLocalToLover];
+            status.formattedDates = [fromNow, dateLocalToCreator, dateLocalToLover];
         }
     };
+
+    $scope.updateRelativeStatusTimes = function () {
+        var status, mom, fromNow;
+        var formatString = "dddd, MMM Do, h:mm a";
+        for (i in $scope.statuses) {
+            status = $scope.statuses[i];
+            mom = moment(status.dateCreatedUtc + "Z");
+            fromNow = mom.fromNow();
+            status.formattedDates[0] = fromNow;
+        }
+    }
 
     $scope.bumpDateIndex = function () {
         $scope.dateIndex = ($scope.dateIndex + 1) % 3;
@@ -142,7 +153,9 @@ app.controller('StatusCtrl', function ($scope, $http) {
     $scope.getUserData = function () {
         $http.get("/api/User").success(function (data, status, headers, config) {
             $scope.me = data.me;
-            $scope.lover = data.lover;          
+            $scope.lover = data.lover;
+            $scope.updateUserTime();
+            $interval($scope.updateUserTime, 10000);
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.title = "Oops... something went wrong";
@@ -150,6 +163,19 @@ app.controller('StatusCtrl', function ($scope, $http) {
         });
     }
 
+    $scope.updateUserTime = function () {
+        var now = moment();
+
+        var meTime = now.tz($scope.me.timeZoneName);
+        $scope.me.day = meTime.format("ddd, MMM Do");
+        $scope.me.time = meTime.format("h:mm a");
+
+        var loverTime = now.tz($scope.lover.timeZoneName);
+        $scope.lover.day = loverTime.format("ddd, MMM Do");
+        $scope.lover.time = loverTime.format("h:mm a");
+    }
+
     $scope.reload();
     $scope.getUserData();
+    $interval($scope.updateRelativeStatusTimes, 60000);
 });

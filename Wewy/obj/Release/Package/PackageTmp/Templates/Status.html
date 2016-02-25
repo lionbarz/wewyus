@@ -5,19 +5,23 @@
                 <div class="user-city-info" ng-style="me.cityName && {'background-image':'url(/resources/'+me.cityName.toLowerCase()+'.jpg)'}">
                     <p class="user-name">{{me.name}}</p>
                     <p>{{me.cityName}}</p>
+                    <p>{{me.day}}</p>
+                    <p>{{me.time}}</p>
                 </div>
             </div>
-        </div>
-        <div class="row user-row" ng-click="reload()">
-            <div class="col-xs-12 text-center heart">❤</div>
         </div>
         <div class="row user-row" ng-click="reload()">
             <div class="col-xs-12 user-col">
                 <div class="user-city-info" ng-style="lover.cityName && {'background-image':'url(/resources/'+lover.cityName.toLowerCase()+'.jpg)'}">
                     <p class="user-name">{{lover.name}}</p>
                     <p>{{lover.cityName}}</p>
+                    <p>{{lover.day}}</p>
+                    <p>{{lover.time}}</p>
                 </div>
             </div>
+        </div>
+        <div class="row user-row" ng-click="reload()">
+            <div class="col-xs-12 text-center heart">❤</div>
         </div>
         <div class="row">
             <div class="col-xs-12">
@@ -50,7 +54,7 @@
                         {{status.text}}
                     </div>
                     <div class="status-date" ng-click="bumpDateIndex()">
-                        {{status.createFormattedDates[dateIndex]}}
+                        {{status.formattedDates[dateIndex]}}
                     </div>
                 </div>
             </div>
