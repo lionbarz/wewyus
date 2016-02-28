@@ -28,23 +28,23 @@ namespace Wewy.Migrations
             //    );
             //
 
-            UserTimeZone tz = new UserTimeZone()
-            {
-                Name = "America/Los_Angeles",
-                Offset = -8
-            };
+            //UserTimeZone tz = new UserTimeZone()
+            //{
+            //    Name = "America/Los_Angeles",
+            //    Offset = -8
+            //};
 
-            context.UserTimeZones.AddOrUpdate(tz);
-            context.Cities.AddOrUpdate(new City() { Name = "Seattle", UserTimeZone = tz, });
+            //context.UserTimeZones.AddOrUpdate(tz);
+            //context.Cities.AddOrUpdate(new City() { Name = "Seattle", UserTimeZone = tz, });
 
-            tz = new UserTimeZone()
-            {
-                Name = "Asia/Beirut",
-                Offset = 2
-            };
+            //tz = new UserTimeZone()
+            //{
+            //    Name = "Asia/Beirut",
+            //    Offset = 2
+            //};
 
-            context.UserTimeZones.AddOrUpdate(tz);
-            context.Cities.AddOrUpdate(new City() { Name = "Beirut", UserTimeZone = tz, });
+            //context.UserTimeZones.AddOrUpdate(tz);
+            //context.Cities.AddOrUpdate(new City() { Name = "Beirut", UserTimeZone = tz, });
         }
     }
 }

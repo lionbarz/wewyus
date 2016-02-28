@@ -215,6 +215,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CityController.cs" />
+    <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoverController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -232,6 +233,10 @@
     <Compile Include="Migrations\201602170535524_Nickname.cs" />
     <Compile Include="Migrations\201602170535524_Nickname.Designer.cs">
       <DependentUpon>201602170535524_Nickname.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602280300589_ModifiedDate.cs" />
+    <Compile Include="Migrations\201602280300589_ModifiedDate.Designer.cs">
+      <DependentUpon>201602280300589_ModifiedDate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -269,6 +274,7 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\app\arabic-support.js" />
     <Content Include="Scripts\app\wewy.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -318,6 +324,7 @@
     <Content Include="Scripts\app\app.viewmodel.js" />
     <Content Include="Scripts\app\common.js" />
     <Content Include="Scripts\app\home.viewmodel.js" />
+    <Content Include="Templates\EditStatus.html" />
     <Content Include="Templates\EditUser.html" />
     <Content Include="Templates\Status.html" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -375,6 +382,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201602170535524_Nickname.resx">
       <DependentUpon>201602170535524_Nickname.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602280300589_ModifiedDate.resx">
+      <DependentUpon>201602280300589_ModifiedDate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -21,6 +21,20 @@ namespace Wewy.Controllers
 
         const int QueryPageSize = 25;
 
+        // Right now we just return the text for the status edit page.
+        [ResponseType(typeof(UIStatus))]
+        public async Task<IHttpActionResult> GetStatus(int id)
+        {
+            Status status = await db.Status.FindAsync(id);
+
+            UIStatus uiStatus = new UIStatus()
+            {
+                Text = status.Text
+            };
+
+            return Ok(uiStatus);
+        }
+
         // GET: api/Status
         [ResponseType(typeof(UIStatus[]))]
         public async Task<IHttpActionResult> GetStatuses()
@@ -46,11 +60,13 @@ namespace Wewy.Controllers
             UIStatus[] uiStatuses = statuses.Select(
                 s => new UIStatus()
                 {
+                    Id = s.StatusId,
                     CreatorName = s.Creator.UserName.Equals(myName) ? "Me" : s.Creator.UserName,
                     DateCreatedUtc = s.DateCreatedUtc,
                     DateCreatedCreator = s.DateCreatedCreator,
                     DateCreatedLover = s.DateCreatedLover,
                     Text = s.Text,
+                    IsRtl = ControllerUtils.IsRtl(s.Text),
                     CreatorCity = s.CreatorCity.Name,
                     LoverCity = s.LoverCity.Name,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName)
@@ -87,17 +103,57 @@ namespace Wewy.Controllers
             UIStatus[] uiStatuses = statuses.Select(
                 s => new UIStatus()
                 {
+                    Id = s.StatusId,
                     CreatorName = s.Creator.UserName.Equals(myName) ? "Me" : s.Creator.UserName,
                     DateCreatedUtc = s.DateCreatedUtc,
                     DateCreatedCreator = s.DateCreatedCreator,
                     DateCreatedLover = s.DateCreatedLover,
                     Text = s.Text,
+                    IsRtl = ControllerUtils.IsRtl(s.Text),
                     CreatorCity = s.CreatorCity.Name,
                     LoverCity = s.LoverCity.Name,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName)
                 }).ToArray();
 
             return Ok(uiStatuses);
+        }
+
+        // PUT: api/Status
+        // Right now we only allow editing the text.
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> PutStatus(int id, UIStatus uiStatus)
+        {
+            string userId = User.Identity.GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            Status status = await db.Status.FindAsync(id);
+
+            DateTime utc;
+            DateTime dateFirst;
+            DateTime dateSecond;
+            ControllerUtils.GetNowDateTimes(status.Relationship, out utc, out dateFirst, out dateSecond);
+
+            if (status.Creator.Id != userId)
+            {
+                return Unauthorized();
+            }
+
+            status.Text = uiStatus.Text;
+            status.DateModifiedUtc = utc;
+            status.DateModifiedCreator = (status.Relationship.FirstId == userId) ? dateFirst : dateSecond;
+            status.DateModifiedLover = (status.Relationship.FirstId == userId) ? dateSecond : dateFirst;
+            db.Status.Attach(status);
+            var entry = db.Entry(status);
+            entry.Property(e => e.Text).IsModified = true;
+            entry.Property(e => e.DateModifiedUtc).IsModified = true;
+            entry.Property(e => e.DateModifiedCreator).IsModified = true;
+            entry.Property(e => e.DateModifiedLover).IsModified = true;
+            await db.SaveChangesAsync();
+            return Ok();
         }
 
         // POST: api/Status
@@ -115,22 +171,21 @@ namespace Wewy.Controllers
 
             ApplicationUser applicationUserMe = (relationship.FirstId == userId) ? relationship.First : relationship.Second;
             ApplicationUser applicationUserLover = (relationship.FirstId == userId) ? relationship.Second : relationship.First;
+            
+            DateTime utc;
+            DateTime dateFirst;
+            DateTime dateSecond;
+            ControllerUtils.GetNowDateTimes(relationship, out utc, out dateFirst, out dateSecond);
 
-            // Offset in hours.
-            TimeSpan offsetMe = new TimeSpan(applicationUserMe.CurrentCity.UserTimeZone.Offset, 0, 0);
-            TimeSpan offsetLover = new TimeSpan(applicationUserLover.CurrentCity.UserTimeZone.Offset, 0, 0);
-
-            DateTime createDateUtc = DateTime.UtcNow;
-            DateTimeOffset createDateUtcOffset = new DateTimeOffset(createDateUtc);
-            DateTimeOffset createDateMeOffset = createDateUtcOffset.ToOffset(offsetMe);
-            DateTimeOffset createDateLoverOffset = createDateUtcOffset.ToOffset(offsetLover);
+            DateTimeOffset createDateMeOffset = (relationship.FirstId == userId) ? dateFirst : dateSecond;
+            DateTimeOffset createDateLoverOffset = (relationship.FirstId == userId) ? dateSecond : dateFirst;
 
             Status status = new Status()
             {
                 CreatorId = User.Identity.GetUserId(),
                 RelationshipId = relationship.RelationshipId,
                 Text = uiStatus.Text,
-                DateCreatedUtc = createDateUtc,
+                DateCreatedUtc = utc,
                 DateCreatedCreator = createDateMeOffset.DateTime,
                 DateCreatedLover = createDateLoverOffset.DateTime,
                 CreatorCityId = applicationUserMe.CurrentCity.CityId,
@@ -140,13 +195,15 @@ namespace Wewy.Controllers
             db.Status.Add(status);
             await db.SaveChangesAsync();
 
-            uiStatus.DateCreatedUtc = createDateUtc;
+            uiStatus.Id = status.StatusId;
+            uiStatus.DateCreatedUtc = utc;
             uiStatus.DateCreatedCreator = createDateMeOffset.DateTime;
             uiStatus.DateCreatedLover = createDateLoverOffset.DateTime;
             uiStatus.CreatorCity = applicationUserMe.CurrentCity.Name;
             uiStatus.LoverCity = applicationUserLover.CurrentCity.Name;
             uiStatus.CreatorName = "Me";
             uiStatus.IsCreatedByUser = true;
+            uiStatus.IsRtl = ControllerUtils.IsRtl(uiStatus.Text);
 
             return Ok(uiStatus);
         }

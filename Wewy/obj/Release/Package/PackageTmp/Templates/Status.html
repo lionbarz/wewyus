@@ -50,9 +50,14 @@
                     Refreshing...
                 </div>
                 <div class="status-box" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
-                    <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">
+                    <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}" dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
                         {{status.text}}
+                        <div class="status-edit-menu" ng-show="status.isCreatedByUser">
+                            <hr/>
+                            <a ng-href="/#EditStatus/{{status.id}}">Edit</a>
+                        </div>
                     </div>
+                    
                     <div class="status-date" ng-click="bumpDateIndex()">
                         {{status.formattedDates[dateIndex]}}
                     </div>

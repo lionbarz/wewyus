@@ -7,6 +7,10 @@ app.config(['$routeProvider',
             templateUrl: 'templates/Status.html',
             controller: 'StatusCtrl'
         }).
+        when('/EditStatus/:statusId', {
+            templateUrl: 'templates/EditStatus.html',
+            controller: 'EditStatusCtrl'
+        }).
         when('/EditUser', {
             templateUrl: 'templates/EditUser.html',
             controller: 'EditUserCtrl'
@@ -178,4 +182,34 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
     $scope.reload();
     $scope.getUserData();
     $interval($scope.updateRelativeStatusTimes, 60000);
+});
+
+app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParams) {
+    
+    $scope.load = function () {
+        $scope.isLoading = true;
+        $http.get("/api/Status/" + $routeParams.statusId).success(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.newStatusText = data.text;
+        }).error(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
+    $scope.save = function () {
+        $scope.isSaving = true;
+        $scope.alert = "Saving...";
+        $http.put("/api/Status?id=" + $routeParams.statusId, { "text": $scope.newStatusText }).success(function (data, status, headers, config) {
+            $scope.alert = "Saved.";
+            $scope.isSaving = false;
+        }).error(function (data, status, headers, config) {
+            $scope.isSaving = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
+    $scope.load();
 });

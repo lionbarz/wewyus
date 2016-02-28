@@ -12,6 +12,9 @@ namespace Wewy.Models
         public DateTime DateCreatedUtc { get; set; }
         public DateTime DateCreatedCreator { get; set; }
         public DateTime DateCreatedLover { get; set; }
+        public DateTime? DateModifiedUtc { get; set; }
+        public DateTime? DateModifiedCreator { get; set; }
+        public DateTime? DateModifiedLover { get; set; }
         public string CreatorId { get; set; }
         public int RelationshipId { get; set; }
         public string Text { get; set; }

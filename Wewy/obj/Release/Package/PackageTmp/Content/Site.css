@@ -39,6 +39,7 @@
     background-color: gainsboro;
     color: black;
     padding: 10px;
+    word-wrap: break-word;
 }
 
 .new-status-box {
@@ -113,6 +114,20 @@ div .user-city-info {
 
 .status-container {
     position: relative;
+}
+
+.status-text hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.status-edit-menu a {
+    color: gainsboro;
+}
+
+.status-edit-textarea {
+    width: 100%;
+    max-width: 600px;
 }
 
 @media screen and (min-width: 620px) {
