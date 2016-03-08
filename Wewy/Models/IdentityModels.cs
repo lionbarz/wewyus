@@ -24,12 +24,9 @@ namespace Wewy.Models
             return userIdentity;
         }
 
-        [InverseProperty("First")]
-        public virtual List<Relationship> RelationshipsWhereFirst { get; set; }
-
-        [InverseProperty("Second")]
-        public virtual List<Relationship> RelationshipsWhereSecond { get; set; }
-
+        [InverseProperty("Members")]
+        public virtual List<Group> Groups { get; set; }
+        
         [InverseProperty("Creator")]
         public virtual List<Status> CreatedStatuses { get; set; }
 
@@ -57,7 +54,7 @@ namespace Wewy.Models
             return new ApplicationDbContext();
         }
 
-        public DbSet<Relationship> Relationships { get; set; }
+        public DbSet<Group> Groups { get; set; }
 
         public DbSet<Status> Status { get; set; }
 

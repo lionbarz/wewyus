@@ -10,25 +10,19 @@ namespace Wewy.Models
     {
         public int StatusId { get; set; }
         public DateTime DateCreatedUtc { get; set; }
-        public DateTime DateCreatedCreator { get; set; }
-        public DateTime DateCreatedLover { get; set; }
+        public DateTime DateCreatedLocal { get; set; } // Local to the creator.
         public DateTime? DateModifiedUtc { get; set; }
-        public DateTime? DateModifiedCreator { get; set; }
-        public DateTime? DateModifiedLover { get; set; }
+        public DateTime? DateModifiedLocal { get; set; }
         public string CreatorId { get; set; }
-        public int RelationshipId { get; set; }
-        public string Text { get; set; }
-        public virtual Relationship Relationship { get; set; }
-        public virtual ApplicationUser Creator { get; set; }
-
+        public int GroupId { get; set; }
         public int CreatorCityId { get; set; }
+        public string Text { get; set; }
 
+        [InverseProperty("Statuses")]
+        public virtual Group Group { get; set; }
+        public virtual ApplicationUser Creator { get; set; }
         [ForeignKey("CreatorCityId")]
         public virtual City CreatorCity { get; set; }
-
-        public int LoverCityId { get; set; }
-
-        [ForeignKey("LoverCityId")]
-        public virtual City LoverCity { get; set; }
+        public virtual List<StatusView> StatusViews { get; set; }
     }
 }

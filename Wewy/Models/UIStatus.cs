@@ -13,15 +13,12 @@ namespace Wewy.Models
         public bool IsRtl { get; set; }
         public string CreatorName { get; set; }
         public DateTime DateCreatedUtc { get; set; }
-        public DateTime DateCreatedCreator { get; set; }
-        public DateTime DateCreatedLover { get; set; }
+        public DateTime DateCreatedLocal { get; set; }
         public DateTime? DateModifiedUtc { get; set; }
-        public DateTime? DateModifiedCreator { get; set; }
-        public DateTime? DateModifiedLover { get; set; }
+        public DateTime? DateModifiedLocal { get; set; }
         public string CreatorCity { get; set; }
-        public string LoverCity { get; set; }
-
         // True if the status was created by the viewing user.
         public bool IsCreatedByUser { get; set; }
+        public List<UIStatusView> Views { get; set; }
     }
 }

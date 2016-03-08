@@ -14,13 +14,9 @@ namespace Wewy.Models
 
         public virtual UserTimeZone UserTimeZone { get; set; }
 
-        // Statuses created from that city.
+        // Statuses created from this city.
         [InverseProperty("CreatorCity")]
-        public virtual List<Status> CreatorStatuses { get; set; }
-
-        // Statuses created by your lover when you lived in this city.
-        [InverseProperty("LoverCity")]
-        public virtual List<Status> LoverStatuses { get; set; }
+        public virtual List<Status> StatusesCreated { get; set; }
 
         // Users who currently reside in this city.
         [InverseProperty("CurrentCity")]

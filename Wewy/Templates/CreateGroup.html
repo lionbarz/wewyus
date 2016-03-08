@@ -1,0 +1,20 @@
+﻿<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Create Group</h1>
+                <p>{{alert}}</p>
+                <p>Email:</p>
+                <input type="text" ng-model="newMemberEmail"/>
+                <button ng-click="addMember()">Add</button>
+                <p>Members:</p>
+                <div ng-repeat="member in members">
+                    <p>{{member.name}}</p>
+                </div>
+                <p>Group name:</p>
+                <input type="text" ng-model="groupName" />
+                <button ng-click="saveGroup()">Done</button>
+            </div>
+        </div>
+    </div>
+</section>

@@ -77,5 +77,3 @@ c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.
 c:\users\mohamed\documents\visual studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.pdb
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.init.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.csproj.GenerateResource.Cache
-C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.Nickname.resources
-C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.ModifiedDate.resources

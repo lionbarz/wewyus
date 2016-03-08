@@ -8,26 +8,45 @@ namespace Wewy.Controllers
 {
     public class ControllerUtils
     {
-        public static bool IsRtl(string text)
+        internal static bool IsRtl(string text)
         {
             return text.Length > 0 && (char)text[0] >= 1568 && (char)text[0] <= 1919;
         }
 
-        public static void GetNowDateTimes(Relationship relationship, out DateTime utc, out DateTime first, out DateTime second)
+        internal static List<StatusView> MakeStatusViews(string userId, Group group, Status status, DateTime utc)
         {
-            ApplicationUser applicationUserFirst = relationship.First;
-            ApplicationUser applicationUserSecond = relationship.Second;
-
-            // Offset in hours.
-            TimeSpan offsetFirst = new TimeSpan(applicationUserFirst.CurrentCity.UserTimeZone.Offset, 0, 0);
-            TimeSpan offsetSecond = new TimeSpan(applicationUserSecond.CurrentCity.UserTimeZone.Offset, 0, 0);
-
-            utc = DateTime.UtcNow;
             DateTimeOffset dateUtcOffset = new DateTimeOffset(utc);
-            DateTimeOffset dateFirstOffset = dateUtcOffset.ToOffset(offsetFirst);
-            DateTimeOffset dateSecondOffset = dateUtcOffset.ToOffset(offsetSecond);
-            first = dateFirstOffset.DateTime;
-            second = dateSecondOffset.DateTime;
+            List<StatusView> views = new List<StatusView>();
+
+            foreach (ApplicationUser viewer in group.Members)
+            {
+                // Offset in hours.
+                TimeSpan offset = new TimeSpan(viewer.CurrentCity.UserTimeZone.Offset, 0, 0);
+                DateTimeOffset dateOffset = dateUtcOffset.ToOffset(offset);
+                views.Add(new StatusView()
+                {
+                    ViewerId = viewer.Id,
+                    Viewer = viewer,
+                    City = viewer.CurrentCity,
+                    CityId = viewer.CurrentCityId,
+                    LocalTime = dateOffset.DateTime,
+                    Status = status,
+                    StatusId = status.StatusId
+                });
+            }
+
+            return views;
+        }
+
+        internal static List<UIStatusView> GetUIViews(List<StatusView> statusViews)
+        {
+            return statusViews.Select(
+                v => new UIStatusView()
+                {
+                    ViewerName = v.Viewer.Nickname,
+                    CityName = v.City.Name,
+                    ViewTimeLocal = v.LocalTime
+                }).ToList();
         }
     }
 }

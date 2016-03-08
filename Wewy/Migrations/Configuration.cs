@@ -17,34 +17,59 @@ namespace Wewy.Migrations
         {
             //  This method will be called after migrating to the latest version.
 
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data. E.g.
-            //
-            //    context.People.AddOrUpdate(
-            //      p => p.FullName,
-            //      new Person { FullName = "Andrew Peters" },
-            //      new Person { FullName = "Brice Lambson" },
-            //      new Person { FullName = "Rowan Miller" }
-            //    );
-            //
+            UserTimeZone laTz = new UserTimeZone()
+            {
+                Name = "America/Los_Angeles",
+                Offset = -8
+            };
 
-            //UserTimeZone tz = new UserTimeZone()
-            //{
-            //    Name = "America/Los_Angeles",
-            //    Offset = -8
-            //};
+            UserTimeZone beirutTz = new UserTimeZone()
+            {
+                Name = "Asia/Beirut",
+                Offset = 2
+            };
 
-            //context.UserTimeZones.AddOrUpdate(tz);
-            //context.Cities.AddOrUpdate(new City() { Name = "Seattle", UserTimeZone = tz, });
+            UserTimeZone austinTz = new UserTimeZone
+            {
+                Name = "America/Houston",
+                Offset = -6
+            };
 
-            //tz = new UserTimeZone()
-            //{
-            //    Name = "Asia/Beirut",
-            //    Offset = 2
-            //};
+            context.UserTimeZones.AddOrUpdate(
+                p => p.Name,
+                laTz,
+                beirutTz,
+                austinTz);
 
-            //context.UserTimeZones.AddOrUpdate(tz);
-            //context.Cities.AddOrUpdate(new City() { Name = "Beirut", UserTimeZone = tz, });
+            context.SaveChanges();
+
+            context.Cities.AddOrUpdate(
+                p => p.Name,
+                new City()
+                {
+                    Name = "Los Angeles",
+                    UserTimeZoneId = laTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Seattle",
+                    UserTimeZoneId = laTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Beirut",
+                    UserTimeZoneId = beirutTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Tripoli",
+                    UserTimeZoneId = beirutTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Austin",
+                    UserTimeZoneId = austinTz.UserTimeZoneId
+                });
         }
     }
 }

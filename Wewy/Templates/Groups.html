@@ -1,0 +1,19 @@
+﻿<script>
+    function memberNames(members)
+    {
+        return members.map(function (e) { return e.name; }).join(', ');
+    }
+</script>
+
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div ng-hide="groups && groups.length > 0"><a href="/#CreateGroup">Add someone to talk to!</a></div>
+                <div ng-repeat="group in groups">
+                    <a ng-href="/#Status?groupId={{group.id}}">{{group.name}} -- {{group.members.length}} members: {{memberNames(group.members)}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

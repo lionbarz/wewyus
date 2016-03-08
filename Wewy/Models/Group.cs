@@ -8,16 +8,11 @@ using System.Web;
 
 namespace Wewy.Models
 {
-    public class Relationship
+    public class Group
     {
-        public int RelationshipId { get; set; }
-        public string FirstId { get; set; }
-        public string SecondId { get; set; }
-
-        public virtual ApplicationUser First { get; set; }
-
-        public virtual ApplicationUser Second { get; set; }
-
+        public int GroupId { get; set; }
+        public string Name { get; set; }
+        public virtual List<ApplicationUser> Members { get; set; }
         public virtual List<Status> Statuses { get; set; }
     }
 }

@@ -15,8 +15,16 @@ app.config(['$routeProvider',
             templateUrl: 'templates/EditUser.html',
             controller: 'EditUserCtrl'
         }).
+        when('/Groups', {
+            templateUrl: 'templates/Groups.html',
+            controller: 'GroupsCtrl'
+        }).
+        when('/CreateGroup', {
+            templateUrl: 'templates/CreateGroup.html',
+            controller: 'CreateGroupCtrl'
+        }).
         otherwise({
-            redirectTo: '/Status'
+            redirectTo: '/Groups'
         });
   }]);
 
@@ -47,26 +55,19 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
     };
 });
 
-app.controller('StatusCtrl', function ($scope, $http, $interval) {
+app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
     var dad = 1;
     $scope.isSendingStatus = false;
     $scope.isLoading = false;
-    $scope.dateIndex = 0;
     $scope.displayMyStatuses = true;
     $scope.displaySortByDay = false;
     $scope.myUserData = null;
     $scope.loverUserData = null;
-
-    $http.get("/api/Lover").success(function (data, status, headers, config) {
-        $scope.loverName = data.name;
-    }).error(function (data, status, headers, config) {
-        $scope.title = "Oops... something went wrong";
-        $scope.working = false;
-    });
+    $scope.groupId = $routeParams.groupId;
 
     $scope.reload = function () {
         $scope.isLoading = true;
-        $http.get("/api/Status").success(function (data, status, headers, config) {
+        $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.statuses = data;
             $scope.updateTimes();
@@ -83,7 +84,7 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
             return;
         }
         $scope.isSendingStatus = true;
-        $http.post("/api/Status", { "text": text }).success(function (data, status, headers, config) {
+        $http.post("/api/Status?groupId=" + $scope.groupId, { "text": text }).success(function (data, status, headers, config) {
             $scope.statuses.unshift(data);
             $scope.newStatusText = "";
             $scope.updateTimes();
@@ -109,9 +110,13 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
             status = $scope.statuses[i];
             mom = moment(status.dateCreatedUtc + "Z"); 
             fromNow = mom.fromNow();
-            dateLocalToCreator = moment(status.dateCreatedCreator).format(formatString) + " (" + status.creatorCity + ")";
-            dateLocalToLover = moment(status.dateCreatedLover).format(formatString) + " (" + status.loverCity + ")";
-            status.formattedDates = [fromNow, dateLocalToCreator, dateLocalToLover];
+            status.formattedDates = [fromNow];
+
+            for (j in status.views) {
+                var view = status.views[j];
+                status.formattedDates.push(moment(view.viewTimeLocal).format(formatString) + " (" + view.cityName + ", " + view.viewerName + ")");
+                status.dateIndex = 0;
+            }
         }
     };
 
@@ -126,10 +131,6 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
         }
     }
 
-    $scope.bumpDateIndex = function () {
-        $scope.dateIndex = ($scope.dateIndex + 1) % 3;
-    }
-
     $scope.changeSort = function () {
         if ($scope.displaySortByDay)
         {
@@ -139,6 +140,7 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
             };
 
             // Show in time local to creator.
+            // TODO: Index 1 is no longer the creator necessarily.
             $scope.dateIndex = 1;
         }
         else
@@ -154,10 +156,9 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
         $scope.statuses.sort(sortFunction);        
     }
 
-    $scope.getUserData = function () {
-        $http.get("/api/User").success(function (data, status, headers, config) {
-            $scope.me = data.me;
-            $scope.lover = data.lover;
+    $scope.getGroupData = function () {
+        $http.get("/api/Group?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
+            $scope.group = data;
             $scope.updateUserTime();
             $interval($scope.updateUserTime, 10000);
         }).error(function (data, status, headers, config) {
@@ -170,17 +171,16 @@ app.controller('StatusCtrl', function ($scope, $http, $interval) {
     $scope.updateUserTime = function () {
         var now = moment();
 
-        var meTime = now.tz($scope.me.timeZoneName);
-        $scope.me.day = meTime.format("ddd, MMM Do");
-        $scope.me.time = meTime.format("h:mm a");
-
-        var loverTime = now.tz($scope.lover.timeZoneName);
-        $scope.lover.day = loverTime.format("ddd, MMM Do");
-        $scope.lover.time = loverTime.format("h:mm a");
+        for (i in $scope.group.members) {
+            var member = $scope.group.members[i];
+            var memberTime = now.tz(member.timeZoneName);
+            member.day = memberTime.format("ddd, MMM Do");
+            member.time = memberTime.format("h:mm a");
+        }
     }
 
     $scope.reload();
-    $scope.getUserData();
+    $scope.getGroupData();
     $interval($scope.updateRelativeStatusTimes, 60000);
 });
 
@@ -212,4 +212,73 @@ app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParam
     };
 
     $scope.load();
+});
+
+app.controller('GroupsCtrl', function ($scope, $http, $interval) {
+
+    $scope.groups = [];
+
+    $scope.load = function () {
+        $scope.isLoading = true;
+        $http.get("/api/Group").success(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.groups = data;
+        }).error(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
+    $scope.load();
+});
+
+app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $window) {
+
+    $scope.members = [];
+    $scope.alert = "";
+
+    $scope.addMember = function () {
+        $scope.alert = "Adding...";
+        $http.get("/api/User?email=" + encodeURI($scope.newMemberEmail)).success(function (data, status, headers, config) {
+            if (data.name) {
+                $scope.members.push(data);
+                $scope.alert = "";
+                $scope.newMemberEmail = "";
+            }
+            else {
+                $scope.alert = $scope.newMemberEmail + " doesn't exist.";
+            } 
+        }).error(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
+    $scope.saveGroup = function () {
+        if (!$scope.groupName)
+        {
+            $scope.alert = "Please specify group name.";
+            return;
+        }
+
+        $scope.alert = "Creating group...";
+
+        $http.post("/api/Group", { "name": $scope.groupName, "members": $scope.members }).success(function (data, status, headers, config) {
+            if (data.id) {
+                $scope.alert = "Saved.";
+                $scope.isSaving = false;
+                $location.path("/Status?groupId=" + data.groupId);
+            } else {
+                $scope.alert = "Something went wrong.";
+                $scope.isSaving = false;
+            }
+        }).error(function (data, status, headers, config) {
+            $scope.isSaving = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
 });

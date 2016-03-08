@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNet.Identity;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Wewy.Models;
@@ -18,36 +16,33 @@ namespace Wewy.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserService userService = new UserService();
-        private RelationshipService relationshipService = new RelationshipService();
 
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> GetUser()
+        [ResponseType(typeof(UIUser))]
+        public async Task<IHttpActionResult> GetUser(string email)
         {
-            string userId = User.Identity.GetUserId();
-            ApplicationUser me = userService.GetUser(userId);
-            ApplicationUser lover = await relationshipService.GetLover(userId);
-
-            var userInfo = new UIUserInfo()
+            ApplicationUser appUser = await db.Users
+                .Where(x => x.Email.Equals(email))
+                .Select(x => x)
+                .FirstOrDefaultAsync();
+            
+            if (appUser == null)
             {
-                Me = new UIUser()
-                {
-                    Name = me.Nickname,
-                    Email = me.Email,
-                    CityName = me.CurrentCity.Name,
-                    TimeZoneName = me.CurrentCity.UserTimeZone.Name
-                },
-                Lover = new UIUser()
-                {
-                    Name = lover.Nickname,
-                    Email = lover.Email,
-                    CityName = lover.CurrentCity.Name,
-                    TimeZoneName = lover.CurrentCity.UserTimeZone.Name
-                }
+                return Ok();
+            }
+
+            var user = new UIUser()
+            {
+                Id = appUser.Id,
+                Name = appUser.Nickname,
+                Email = appUser.Email,
+                CityName = appUser.CurrentCity.Name,
+                TimeZoneName = appUser.CurrentCity.UserTimeZone.Name
             };
 
-            return Ok(userInfo);
+            return Ok(user);
         }
 
+        // Currently just for changing the city.
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutUser(UIUser modifiedUser)
         {

@@ -20,16 +20,16 @@ namespace Wewy.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/Relationships
-        public IQueryable<Relationship> GetRelationships()
+        public IQueryable<Group> GetRelationships()
         {
-            return db.Relationships;
+            return db.Groups;
         }
 
         // GET: api/Relationships/5
-        [ResponseType(typeof(Relationship))]
+        [ResponseType(typeof(Group))]
         public IHttpActionResult GetRelationship(int id)
         {
-            Relationship relationship = db.Relationships.Find(id);
+            Group relationship = db.Groups.Find(id);
             if (relationship == null)
             {
                 return NotFound();
@@ -40,14 +40,14 @@ namespace Wewy.Controllers
         
         // PUT: api/Relationships/5
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutRelationship(int id, Relationship relationship)
+        public IHttpActionResult PutRelationship(int id, Group relationship)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != relationship.RelationshipId)
+            if (id != relationship.GroupId)
             {
                 return BadRequest();
             }
@@ -74,31 +74,31 @@ namespace Wewy.Controllers
         }
 
         // POST: api/Relationships
-        [ResponseType(typeof(Relationship))]
-        public IHttpActionResult PostRelationship(Relationship relationship)
+        [ResponseType(typeof(Group))]
+        public IHttpActionResult PostRelationship(Group relationship)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Relationships.Add(relationship);
+            db.Groups.Add(relationship);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = relationship.RelationshipId }, relationship);
+            return CreatedAtRoute("DefaultApi", new { id = relationship.GroupId }, relationship);
         }
 
         // DELETE: api/Relationships/5
-        [ResponseType(typeof(Relationship))]
+        [ResponseType(typeof(Group))]
         public IHttpActionResult DeleteRelationship(int id)
         {
-            Relationship relationship = db.Relationships.Find(id);
+            Group relationship = db.Groups.Find(id);
             if (relationship == null)
             {
                 return NotFound();
             }
 
-            db.Relationships.Remove(relationship);
+            db.Groups.Remove(relationship);
             db.SaveChanges();
 
             return Ok(relationship);
@@ -115,7 +115,7 @@ namespace Wewy.Controllers
 
         private bool RelationshipExists(int id)
         {
-            return db.Relationships.Count(e => e.RelationshipId == id) > 0;
+            return db.Groups.Count(e => e.GroupId == id) > 0;
         }
     }
 }

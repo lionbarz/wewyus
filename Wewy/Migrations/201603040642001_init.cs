@@ -8,18 +8,16 @@ namespace Wewy.Migrations
         public override void Up()
         {
             CreateTable(
-                "dbo.Relationships",
+                "dbo.Cities",
                 c => new
                     {
-                        RelationshipId = c.Int(nullable: false, identity: true),
-                        FirstId = c.String(maxLength: 128),
-                        SecondId = c.String(maxLength: 128),
+                        CityId = c.Int(nullable: false, identity: true),
+                        Name = c.String(),
+                        UserTimeZoneId = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.RelationshipId)
-                .ForeignKey("dbo.AspNetUsers", t => t.FirstId)
-                .ForeignKey("dbo.AspNetUsers", t => t.SecondId)
-                .Index(t => t.FirstId)
-                .Index(t => t.SecondId);
+                .PrimaryKey(t => t.CityId)
+                .ForeignKey("dbo.UserTimeZones", t => t.UserTimeZoneId)
+                .Index(t => t.UserTimeZoneId);
             
             CreateTable(
                 "dbo.AspNetUsers",
@@ -27,6 +25,7 @@ namespace Wewy.Migrations
                     {
                         Id = c.String(nullable: false, maxLength: 128),
                         Hometown = c.String(),
+                        Nickname = c.String(),
                         CurrentCityId = c.Int(nullable: false),
                         Email = c.String(maxLength: 256),
                         EmailConfirmed = c.Boolean(nullable: false),
@@ -64,45 +63,48 @@ namespace Wewy.Migrations
                     {
                         StatusId = c.Int(nullable: false, identity: true),
                         DateCreatedUtc = c.DateTime(nullable: false),
-                        DateCreatedCreator = c.DateTime(nullable: false),
-                        DateCreatedLover = c.DateTime(nullable: false),
+                        DateCreatedLocal = c.DateTime(nullable: false),
+                        DateModifiedUtc = c.DateTime(),
+                        DateModifiedLocal = c.DateTime(),
                         CreatorId = c.String(maxLength: 128),
-                        RelationshipId = c.Int(nullable: false),
-                        Text = c.String(),
+                        GroupId = c.Int(nullable: false),
                         CreatorCityId = c.Int(nullable: false),
-                        LoverCityId = c.Int(nullable: false),
+                        Text = c.String(),
                     })
                 .PrimaryKey(t => t.StatusId)
-                .ForeignKey("dbo.Cities", t => t.CreatorCityId)
-                .ForeignKey("dbo.Cities", t => t.LoverCityId)
-                .ForeignKey("dbo.Relationships", t => t.RelationshipId)
+                .ForeignKey("dbo.Groups", t => t.GroupId)
                 .ForeignKey("dbo.AspNetUsers", t => t.CreatorId)
+                .ForeignKey("dbo.Cities", t => t.CreatorCityId)
                 .Index(t => t.CreatorId)
-                .Index(t => t.RelationshipId)
-                .Index(t => t.CreatorCityId)
-                .Index(t => t.LoverCityId);
+                .Index(t => t.GroupId)
+                .Index(t => t.CreatorCityId);
             
             CreateTable(
-                "dbo.Cities",
+                "dbo.Groups",
                 c => new
                     {
-                        CityId = c.Int(nullable: false, identity: true),
+                        GroupId = c.Int(nullable: false, identity: true),
                         Name = c.String(),
-                        UserTimeZoneId = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.CityId)
-                .ForeignKey("dbo.UserTimeZones", t => t.UserTimeZoneId)
-                .Index(t => t.UserTimeZoneId);
+                .PrimaryKey(t => t.GroupId);
             
             CreateTable(
-                "dbo.UserTimeZones",
+                "dbo.StatusViews",
                 c => new
                     {
-                        UserTimeZoneId = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
-                        Offset = c.Int(nullable: false),
+                        StatusViewId = c.Int(nullable: false, identity: true),
+                        StatusId = c.Int(nullable: false),
+                        ViewerId = c.String(maxLength: 128),
+                        CityId = c.Int(nullable: false),
+                        LocalTime = c.DateTime(nullable: false),
                     })
-                .PrimaryKey(t => t.UserTimeZoneId);
+                .PrimaryKey(t => t.StatusViewId)
+                .ForeignKey("dbo.Cities", t => t.CityId)
+                .ForeignKey("dbo.Status", t => t.StatusId)
+                .ForeignKey("dbo.AspNetUsers", t => t.ViewerId)
+                .Index(t => t.StatusId)
+                .Index(t => t.ViewerId)
+                .Index(t => t.CityId);
             
             CreateTable(
                 "dbo.AspNetUserLogins",
@@ -130,6 +132,16 @@ namespace Wewy.Migrations
                 .Index(t => t.RoleId);
             
             CreateTable(
+                "dbo.UserTimeZones",
+                c => new
+                    {
+                        UserTimeZoneId = c.Int(nullable: false, identity: true),
+                        Name = c.String(),
+                        Offset = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.UserTimeZoneId);
+            
+            CreateTable(
                 "dbo.AspNetRoles",
                 c => new
                     {
@@ -139,45 +151,64 @@ namespace Wewy.Migrations
                 .PrimaryKey(t => t.Id)
                 .Index(t => t.Name, unique: true, name: "RoleNameIndex");
             
+            CreateTable(
+                "dbo.ApplicationUserGroups",
+                c => new
+                    {
+                        ApplicationUser_Id = c.String(nullable: false, maxLength: 128),
+                        Group_GroupId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.ApplicationUser_Id, t.Group_GroupId })
+                .ForeignKey("dbo.AspNetUsers", t => t.ApplicationUser_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Groups", t => t.Group_GroupId, cascadeDelete: true)
+                .Index(t => t.ApplicationUser_Id)
+                .Index(t => t.Group_GroupId);
+            
         }
         
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
-            DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.Relationships", "SecondId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.Relationships", "FirstId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.Status", "CreatorId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.Status", "RelationshipId", "dbo.Relationships");
             DropForeignKey("dbo.Cities", "UserTimeZoneId", "dbo.UserTimeZones");
-            DropForeignKey("dbo.AspNetUsers", "CurrentCityId", "dbo.Cities");
-            DropForeignKey("dbo.Status", "LoverCityId", "dbo.Cities");
             DropForeignKey("dbo.Status", "CreatorCityId", "dbo.Cities");
+            DropForeignKey("dbo.AspNetUsers", "CurrentCityId", "dbo.Cities");
+            DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.ApplicationUserGroups", "Group_GroupId", "dbo.Groups");
+            DropForeignKey("dbo.ApplicationUserGroups", "ApplicationUser_Id", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Status", "CreatorId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.StatusViews", "ViewerId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.StatusViews", "StatusId", "dbo.Status");
+            DropForeignKey("dbo.StatusViews", "CityId", "dbo.Cities");
+            DropForeignKey("dbo.Status", "GroupId", "dbo.Groups");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
+            DropIndex("dbo.ApplicationUserGroups", new[] { "Group_GroupId" });
+            DropIndex("dbo.ApplicationUserGroups", new[] { "ApplicationUser_Id" });
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
             DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
-            DropIndex("dbo.Cities", new[] { "UserTimeZoneId" });
-            DropIndex("dbo.Status", new[] { "LoverCityId" });
+            DropIndex("dbo.StatusViews", new[] { "CityId" });
+            DropIndex("dbo.StatusViews", new[] { "ViewerId" });
+            DropIndex("dbo.StatusViews", new[] { "StatusId" });
             DropIndex("dbo.Status", new[] { "CreatorCityId" });
-            DropIndex("dbo.Status", new[] { "RelationshipId" });
+            DropIndex("dbo.Status", new[] { "GroupId" });
             DropIndex("dbo.Status", new[] { "CreatorId" });
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
             DropIndex("dbo.AspNetUsers", new[] { "CurrentCityId" });
-            DropIndex("dbo.Relationships", new[] { "SecondId" });
-            DropIndex("dbo.Relationships", new[] { "FirstId" });
+            DropIndex("dbo.Cities", new[] { "UserTimeZoneId" });
+            DropTable("dbo.ApplicationUserGroups");
             DropTable("dbo.AspNetRoles");
+            DropTable("dbo.UserTimeZones");
             DropTable("dbo.AspNetUserRoles");
             DropTable("dbo.AspNetUserLogins");
-            DropTable("dbo.UserTimeZones");
-            DropTable("dbo.Cities");
+            DropTable("dbo.StatusViews");
+            DropTable("dbo.Groups");
             DropTable("dbo.Status");
             DropTable("dbo.AspNetUserClaims");
             DropTable("dbo.AspNetUsers");
-            DropTable("dbo.Relationships");
+            DropTable("dbo.Cities");
         }
     }
 }

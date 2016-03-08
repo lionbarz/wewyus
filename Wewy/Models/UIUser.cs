@@ -7,6 +7,7 @@ namespace Wewy.Models
 {
     public class UIUser
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string CityName { get; set; }
