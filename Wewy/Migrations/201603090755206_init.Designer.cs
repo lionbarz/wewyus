@@ -13,7 +13,7 @@ namespace Wewy.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201603040642001_init"; }
+            get { return "201603090755206_init"; }
         }
         
         string IMigrationMetadata.Source

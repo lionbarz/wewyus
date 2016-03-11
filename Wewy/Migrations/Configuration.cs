@@ -29,22 +29,46 @@ namespace Wewy.Migrations
                 Offset = 2
             };
 
-            UserTimeZone austinTz = new UserTimeZone
+            UserTimeZone chicagoTz = new UserTimeZone
             {
-                Name = "America/Houston",
+                Name = "America/Chicago",
                 Offset = -6
+            };
+
+            UserTimeZone tokyoTz = new UserTimeZone
+            {
+                Name = "Asia/Tokyo",
+                Offset = 9
+            };
+
+            UserTimeZone seoulTz = new UserTimeZone
+            {
+                Name = "Asia/Seoul",
+                Offset = 9
             };
 
             context.UserTimeZones.AddOrUpdate(
                 p => p.Name,
                 laTz,
                 beirutTz,
-                austinTz);
+                chicagoTz,
+                tokyoTz,
+                seoulTz);
 
             context.SaveChanges();
 
             context.Cities.AddOrUpdate(
                 p => p.Name,
+                new City()
+                {
+                    Name = "Austin",
+                    UserTimeZoneId = chicagoTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Beirut",
+                    UserTimeZoneId = beirutTz.UserTimeZoneId
+                },
                 new City()
                 {
                     Name = "Los Angeles",
@@ -57,18 +81,18 @@ namespace Wewy.Migrations
                 },
                 new City()
                 {
-                    Name = "Beirut",
-                    UserTimeZoneId = beirutTz.UserTimeZoneId
+                    Name = "Seoul",
+                    UserTimeZoneId = chicagoTz.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "Tokyo",
+                    UserTimeZoneId = chicagoTz.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "Tripoli",
                     UserTimeZoneId = beirutTz.UserTimeZoneId
-                },
-                new City()
-                {
-                    Name = "Austin",
-                    UserTimeZoneId = austinTz.UserTimeZoneId
                 });
         }
     }

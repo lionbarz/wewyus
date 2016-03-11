@@ -29,16 +29,15 @@
 }
 
 .status-date {
-    text-align: center;
+    color: grey;
     width: 100%;
 }
 
 .status-text {
     width: 100%;
-    border-radius: 10px;
-    background-color: gainsboro;
+    border-radius: 0px;
     color: black;
-    padding: 10px;
+    padding: 10px 0;
     word-wrap: break-word;
 }
 
@@ -47,14 +46,20 @@
 }
 
 .my-status-text {
-    background-color: cornflowerblue;
+}
+
+.status-creator-name {
+    font-weight: bold;
 }
 
 .status-box {
-    margin-bottom: 5px;
-    display: flex;
-    flex-wrap: wrap;
+    padding: 10px;
+    margin-bottom: 10px;
     width: 100%;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 10px solid grey;
+    border-left: 1px solid black;
 }
 
 .send-status-box, .reload-status-box {
@@ -73,26 +78,18 @@
     background-repeat: no-repeat;
 }
 
-.city-pic {
-    width: 140px;
-    height: 90px;
+.group-name-row {
+    margin-bottom: 10px;
 }
 
 .user-row {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    border-top: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
 }
 
-.user-col {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-div .user-city-info {
-    padding-left: 140px;
-    width: 100%;
-    height: 90px;
-    background-repeat: no-repeat;
-    background-color: cornflowerblue;
+.user-name-col {
+    font-weight: bold;
 }
 
 .user-city-info p {
@@ -122,7 +119,7 @@ div .user-city-info {
 }
 
 .status-edit-menu a {
-    color: gainsboro;
+    color: blue;
 }
 
 .status-edit-textarea {
@@ -130,6 +127,18 @@ div .user-city-info {
     max-width: 600px;
 }
 
+.new-group-link-row {
+    margin: 10px 0;
+}
+
+.group-list-item-row {
+    font-size: larger;
+    margin: 10px 0;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+/* Not designed for larger screen sizes!*/
 @media screen and (min-width: 620px) {
     .status-container {
         width: 600px;

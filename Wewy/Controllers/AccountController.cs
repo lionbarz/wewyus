@@ -167,8 +167,9 @@ namespace Wewy.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    Hometown = "Alloub Hamayt",
-                    CurrentCityId = model.HometownId
+                    Hometown = "N/A",
+                    CurrentCityId = model.HometownId,
+                    Nickname = model.Nickname
                 };
 
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -392,7 +393,8 @@ namespace Wewy.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     Hometown = "Alloub Hamayt",
-                    CurrentCityId = model.HometownId
+                    CurrentCityId = model.HometownId,
+                    Nickname = model.Nickname
                 };
 
                 var result = await UserManager.CreateAsync(user);

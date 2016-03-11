@@ -6,14 +6,10 @@
             </div>
         </div>
         <div class="row user-row" ng-repeat="member in group.members" ng-click="reload()">
-            <div class="col-xs-12 user-col">
-                <div class="user-city-info" ng-style="member.cityName && {'background-image':'url(/resources/'+member.cityName.toLowerCase()+'.jpg)'}">
-                    <p class="user-name">{{member.name}}</p>
-                    <p>{{member.cityName}}</p>
-                    <p>{{member.day}}</p>
-                    <p>{{member.time}}</p>
-                </div>
-            </div>
+            <div class="col-sm-3 col-xs-6 user-name-col">{{member.name}}</div>
+            <div class="col-sm-3 col-xs-6 user-city-col">{{member.cityName}}</div>
+            <div class="col-sm-3 col-xs-6 user-day-col">{{member.day}}</div>
+            <div class="col-sm-3 col-xs-6 user-time-col">{{member.time}}</div>
         </div>
         <div class="row">
             <div class="col-xs-12">
@@ -27,14 +23,6 @@
                         </div>
                     </form>
                 </div>
-                <div>
-                    <label>
-                        <input type="checkbox" ng-model="displayMyStatuses"> Show mine
-                    </label>
-                    <label>
-                        <input type="checkbox" ng-model="displaySortByDay" ng-change="changeSort()"> Show by day
-                    </label>
-                </div>
                 <div class="send-status-box text-center" ng-show="isSendingStatus">
                     Sending...
                 </div>
@@ -42,14 +30,13 @@
                     Refreshing...
                 </div>
                 <div class="status-box" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
-                    <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}" dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
-                        {{status.text}}
+                    <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
+                        <div class="status-creator-name">{{status.creatorName}}</div>
                         <div class="status-date" ng-click="status.dateIndex = (status.dateIndex + 1) % status.formattedDates.length">
-                            <hr />
                             {{status.formattedDates[status.dateIndex]}}
                         </div>
+                        <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">{{status.text}}</div>
                         <div class="status-edit-menu" ng-show="status.isCreatedByUser">
-                            <hr/>
                             <a ng-href="/#EditStatus/{{status.id}}">Edit</a>
                         </div>
                     </div>

@@ -23,7 +23,14 @@ namespace Wewy.Controllers
         [ResponseType(typeof(UIStatus))]
         public async Task<IHttpActionResult> GetStatus(int id)
         {
+            string userId = User.Identity.GetUserId();
+
             Status status = await db.Status.FindAsync(id);
+
+            if (status.Creator.Id.Equals(userId))
+            {
+                return BadRequest("You don't own this status.");
+            }
 
             UIStatus uiStatus = new UIStatus()
             {
@@ -46,6 +53,11 @@ namespace Wewy.Controllers
                 return BadRequest(string.Format("Group {0} doesn't exit.", groupId));
             }
 
+            if (!group.Members.Any(x => x.Id.Equals(userId)))
+            {
+                return BadRequest("You're not in this group.");
+            }
+
             string myName = User.Identity.GetUserName();
 
             var statuses = await db.Status
@@ -59,7 +71,7 @@ namespace Wewy.Controllers
                 s => new UIStatus()
                 {
                     Id = s.StatusId,
-                    CreatorName = s.Creator.UserName.Equals(myName) ? "Me" : s.Creator.UserName,
+                    CreatorName = s.Creator.Nickname,
                     DateCreatedUtc = s.DateCreatedUtc,
                     DateCreatedLocal = s.DateCreatedLocal,
                     DateModifiedUtc = s.DateModifiedUtc,
@@ -83,17 +95,22 @@ namespace Wewy.Controllers
 
             string userId = User.Identity.GetUserId();
 
-            Group relationship = await db.Groups.FindAsync(groupId);
+            Group group = await db.Groups.FindAsync(groupId);
 
-            if (relationship == null)
+            if (group == null)
             {
                 return Ok();
+            }
+
+            if (!group.Members.Any(x => x.Id.Equals(userId)))
+            {
+                return BadRequest("You're not in this group.");
             }
 
             string myName = User.Identity.GetUserName();
 
             var statuses = await db.Status
-                .Where(s => s.GroupId == relationship.GroupId && s.DateCreatedLocal > target && s.DateCreatedLocal < targetPlusDay)
+                .Where(s => s.GroupId == group.GroupId && s.DateCreatedLocal > target && s.DateCreatedLocal < targetPlusDay)
                 .Select(s => s)
                 .OrderByDescending(s => s.DateCreatedLocal)
                 .Take(QueryPageSize)
@@ -137,6 +154,11 @@ namespace Wewy.Controllers
                 return BadRequest(string.Format("Status {0} doesn't exist.", id));
             }
 
+            if (status.Creator.Id.Equals(userId))
+            {
+                return BadRequest("You don't own this status.");
+            }
+
             ApplicationUser applicationUser = db.Users.Find(userId);
 
             // Offset in hours.
@@ -175,6 +197,11 @@ namespace Wewy.Controllers
             if (group == null)
             {
                 return BadRequest(string.Format("Group {0} doesn't exit.", groupId));
+            }
+
+            if (!group.Members.Any(x => x.Id.Equals(userId)))
+            {
+                return BadRequest("You're not in this group.");
             }
 
             ApplicationUser applicationUser = db.Users.Find(userId);

@@ -3,7 +3,7 @@
 app.config(['$routeProvider',
   function ($routeProvider) {
       $routeProvider.
-        when('/Status', {
+        when('/Status/:groupId', {
             templateUrl: 'templates/Status.html',
             controller: 'StatusCtrl'
         }).
@@ -103,7 +103,7 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
             dateLocalToCreator,
             dateLocalToLover;
 
-        var formatString = "dddd, MMM Do, h:mm a";
+        var formatString = "ddd, MMM Do, h:mm a";
 
         for (i in $scope.statuses)
         {
@@ -122,7 +122,6 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
 
     $scope.updateRelativeStatusTimes = function () {
         var status, mom, fromNow;
-        var formatString = "dddd, MMM Do, h:mm a";
         for (i in $scope.statuses) {
             status = $scope.statuses[i];
             mom = moment(status.dateCreatedUtc + "Z");
