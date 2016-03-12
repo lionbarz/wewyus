@@ -27,7 +27,7 @@ namespace Wewy.Controllers
 
             Status status = await db.Status.FindAsync(id);
 
-            if (status.Creator.Id.Equals(userId))
+            if (!status.Creator.Id.Equals(userId))
             {
                 return BadRequest("You don't own this status.");
             }
@@ -154,7 +154,7 @@ namespace Wewy.Controllers
                 return BadRequest(string.Format("Status {0} doesn't exist.", id));
             }
 
-            if (status.Creator.Id.Equals(userId))
+            if (!status.Creator.Id.Equals(userId))
             {
                 return BadRequest("You don't own this status.");
             }
