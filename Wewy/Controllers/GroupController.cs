@@ -17,7 +17,7 @@ namespace Wewy.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserService userService = new UserService();
 
-        // Just return the id, name and names of the members in the group info.
+        // Just return the id, name and names and ids of the members in the group info.
         [ResponseType(typeof(List<UIGroup>))]
         public IHttpActionResult GetGroups()
         {
@@ -31,6 +31,7 @@ namespace Wewy.Controllers
                     Members = x.Members.Select(
                         m => new UIUser()
                         {
+                            Id = m.Id,
                             Name = m.Nickname
                         }).ToList()
                 }).ToList();
@@ -52,6 +53,7 @@ namespace Wewy.Controllers
                 Members = members.Select(
                     x => new UIUser()
                     {
+                        Id = x.Id,
                         Name = x.Nickname,
                         CityName = x.CurrentCity.Name,
                         Email = x.Email,

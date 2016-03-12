@@ -72,6 +72,7 @@ namespace Wewy.Controllers
                 {
                     Id = s.StatusId,
                     CreatorName = s.Creator.Nickname,
+                    CreatorId = s.Creator.Id,
                     DateCreatedUtc = s.DateCreatedUtc,
                     DateCreatedLocal = s.DateCreatedLocal,
                     DateModifiedUtc = s.DateModifiedUtc,
@@ -99,7 +100,7 @@ namespace Wewy.Controllers
 
             if (group == null)
             {
-                return Ok();
+                return BadRequest(string.Format("Group {0} doesn't exit.", groupId));
             }
 
             if (!group.Members.Any(x => x.Id.Equals(userId)))
@@ -120,7 +121,8 @@ namespace Wewy.Controllers
                 s => new UIStatus()
                 {
                     Id = s.StatusId,
-                    CreatorName = s.Creator.UserName.Equals(myName) ? "Me" : s.Creator.UserName,
+                    CreatorName = s.Creator.Nickname,
+                    CreatorId = s.Creator.Id,
                     DateCreatedUtc = s.DateCreatedUtc,
                     DateCreatedLocal = s.DateCreatedLocal,
                     DateModifiedUtc = s.DateModifiedUtc,
@@ -236,7 +238,8 @@ namespace Wewy.Controllers
             uiStatus.DateCreatedUtc = status.DateCreatedUtc;
             uiStatus.DateCreatedLocal = status.DateCreatedLocal;
             uiStatus.CreatorCity = status.CreatorCity.Name;
-            uiStatus.CreatorName = "Me";
+            uiStatus.CreatorName = status.Creator.Nickname;
+            uiStatus.CreatorId = status.Creator.Id;
             uiStatus.IsCreatedByUser = true;
             uiStatus.IsRtl = ControllerUtils.IsRtl(uiStatus.Text);
             uiStatus.Views = ControllerUtils.GetUIViews(status.StatusViews);

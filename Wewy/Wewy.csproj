@@ -322,7 +322,7 @@
     <Content Include="Templates\EditStatus.html" />
     <Content Include="Templates\EditUser.html" />
     <Content Include="Templates\Groups.html" />
-    <Content Include="Templates\Status.html" />
+    <Content Include="Templates\Group.html" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />

@@ -12,6 +12,7 @@ namespace Wewy.Models
         public string Text { get; set; }
         public bool IsRtl { get; set; }
         public string CreatorName { get; set; }
+        public string CreatorId { get; set; }
         public DateTime DateCreatedUtc { get; set; }
         public DateTime DateCreatedLocal { get; set; }
         public DateTime? DateModifiedUtc { get; set; }

@@ -5,7 +5,7 @@
                 <h3>{{group.name}}</h3>
             </div>
         </div>
-        <div class="row user-row" ng-repeat="member in group.members" ng-click="reload()">
+        <div class="row user-row" ng-style="{ 'border-color' : member.color }" ng-repeat="member in group.members" ng-click="reload()">
             <div class="col-sm-3 col-xs-6 user-name-col">{{member.name}}</div>
             <div class="col-sm-3 col-xs-6 user-city-col">{{member.cityName}}</div>
             <div class="col-sm-3 col-xs-6 user-day-col">{{member.day}}</div>
@@ -29,7 +29,7 @@
                 <div class="reload-status-box text-center" ng-show="isLoading">
                     Refreshing...
                 </div>
-                <div class="status-box" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
+                <div class="status-box" ng-style="{ 'border-bottom-color': status.color }" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
                     <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
                         <div class="status-creator-name">{{status.creatorName}}</div>
                         <div class="status-date" ng-click="status.dateIndex = (status.dateIndex + 1) % status.formattedDates.length">

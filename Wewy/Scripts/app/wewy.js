@@ -3,9 +3,9 @@
 app.config(['$routeProvider',
   function ($routeProvider) {
       $routeProvider.
-        when('/Status/:groupId', {
-            templateUrl: 'templates/Status.html',
-            controller: 'StatusCtrl'
+        when('/Group/:groupId', {
+            templateUrl: 'templates/Group.html',
+            controller: 'GroupCtrl'
         }).
         when('/EditStatus/:statusId', {
             templateUrl: 'templates/EditStatus.html',
@@ -45,7 +45,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/User", { "cityName": $scope.cityName }).success(function (data, status, headers, config) {
-            $window.location.href = '/#Status';
+            $window.history.back();
             $scope.isSaving = false;
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
@@ -55,7 +55,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
     };
 });
 
-app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
+app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     var dad = 1;
     $scope.isSendingStatus = false;
     $scope.isLoading = false;
@@ -70,6 +70,7 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.statuses = data;
+            $scope.colorStatuses();
             $scope.updateTimes();
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
@@ -89,6 +90,7 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
             $scope.newStatusText = "";
             $scope.updateTimes();
             $scope.isSendingStatus = false;
+            $scope.colorStatuses();
         }).error(function (data, status, headers, config) {
             $scope.isSendingStatus = false;
             $scope.title = "Oops... something went wrong";
@@ -158,8 +160,11 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.getGroupData = function () {
         $http.get("/api/Group?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.group = data;
+            $scope.assignMemberColors();
+            $scope.hashMembersById();
             $scope.updateUserTime();
             $interval($scope.updateUserTime, 10000);
+            $scope.reload();
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.title = "Oops... something went wrong";
@@ -170,20 +175,41 @@ app.controller('StatusCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.updateUserTime = function () {
         var now = moment();
 
-        for (i in $scope.group.members) {
-            var member = $scope.group.members[i];
+        for (var member of $scope.group.members) {
             var memberTime = now.tz(member.timeZoneName);
             member.day = memberTime.format("ddd, MMM Do");
             member.time = memberTime.format("h:mm a");
         }
     }
 
-    $scope.reload();
+    $scope.assignMemberColors = function () {
+        // Assign a color to each member and start repeating if more members than colors.
+        var colors = ["darkblue", "darkred",  "darkgoldenrod", "darkolivegreen", "black", "darkgrey"];
+        for (var i=0; i < $scope.group.members.length; i++) {
+            $scope.group.members[i].color = colors[i % colors.length];
+        }
+    }
+
+    $scope.hashMembersById = function () {
+        $scope.group.membersById = [];
+
+        // For faster lookup when coloring statuses.
+        for (var member of $scope.group.members) {
+            $scope.group.membersById[member.id] = member;
+        }
+    }
+
+    $scope.colorStatuses = function () {
+        for (var status of $scope.statuses) {
+            status.color = $scope.group.membersById[status.creatorId].color;
+        }
+    }
+
     $scope.getGroupData();
     $interval($scope.updateRelativeStatusTimes, 60000);
 });
 
-app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParams) {
+app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParams, $window) {
     
     $scope.load = function () {
         $scope.isLoading = true;
@@ -203,6 +229,7 @@ app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParam
         $http.put("/api/Status?id=" + $routeParams.statusId, { "text": $scope.newStatusText }).success(function (data, status, headers, config) {
             $scope.alert = "Saved.";
             $scope.isSaving = false;
+            $window.history.back();
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
             $scope.alert = "Oops... something went wrong";
@@ -232,7 +259,7 @@ app.controller('GroupsCtrl', function ($scope, $http, $interval) {
     $scope.load();
 });
 
-app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $window) {
+app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location) {
 
     $scope.members = [];
     $scope.alert = "";
@@ -268,7 +295,7 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $window) {
             if (data.id) {
                 $scope.alert = "Saved.";
                 $scope.isSaving = false;
-                $location.path("/Status?groupId=" + data.groupId);
+                $location.path("/Group/" + data.id);
             } else {
                 $scope.alert = "Something went wrong.";
                 $scope.isSaving = false;
