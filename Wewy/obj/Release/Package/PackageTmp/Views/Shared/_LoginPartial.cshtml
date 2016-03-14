@@ -7,10 +7,9 @@
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
-        <li><a href="/#EditUser">Settings</a></li>
         <li>
-            @Html.ActionLink("Hello " + (new UserService()).GetUserNickname(User.Identity.GetUserId()) + "!", "Index", "Manage", routeValues: new { area = "" }, htmlAttributes: new { title = "Manage" })
-        </li>
+            <a href="/#/EditUser">Hello, @((new UserService()).GetUserNickname(User.Identity.GetUserId()))</a>
+</li>
         <li><a href="javascript:sessionStorage.removeItem('accessToken');$('#logoutForm').submit();">Log off</a></li>
     </ul>
     }

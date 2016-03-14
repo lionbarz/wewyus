@@ -1,11 +1,4 @@
-﻿<script>
-    function memberNames(members)
-    {
-        return members.map(function (e) { return e.name; }).join(', ');
-    }
-</script>
-
-<section id="content">
+﻿<section id="content">
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
@@ -22,12 +15,11 @@
                 <div>Loading...</div>
             </div>
         </div>
-        <div class="row group-list-item-row">
+        <div class="row group-list-item-row" ng-repeat="group in groups">
             <div class="col-xs-12">
-                <div ng-repeat="group in groups">
-                    <a ng-href="/#Status/{{group.id}}">{{group.name}}</a>
-                    <div>{{group.members.length}} members</div>
-                    <div>{{memberNames(group.members)}}</div>
+                <div>
+                    <a ng-href="/#Group/{{group.id}}">{{group.name}}</a>
+                    <div>{{group.preview}} ({{group.members.length}} members)</div>
                 </div>
             </div>
         </div>

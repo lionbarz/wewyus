@@ -8,6 +8,29 @@ namespace Wewy.Controllers
 {
     public class ControllerUtils
     {
+        internal class UserComparer : IEqualityComparer<ApplicationUser>
+        {
+            public bool Equals(ApplicationUser x, ApplicationUser y)
+            {
+                if (x == y)
+                {
+                    return true;
+                }
+
+                if (x == null || y == null)
+                {
+                    return false;
+                }
+
+                return x.Id.Equals(y.Id);
+            }
+
+            public int GetHashCode(ApplicationUser obj)
+            {
+                return obj.Id.GetHashCode();
+            }
+        }
+
         internal static bool IsRtl(string text)
         {
             return text.Length > 0 && (char)text[0] >= 1568 && (char)text[0] <= 1919;

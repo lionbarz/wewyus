@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -144,11 +145,6 @@ namespace Wewy.Controllers
         {
             string userId = User.Identity.GetUserId();
 
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
             Status status = await db.Status.FindAsync(id);
 
             if (status == null)
@@ -184,7 +180,23 @@ namespace Wewy.Controllers
             entry.Property(e => e.Text).IsModified = true;
             entry.Property(e => e.DateModifiedUtc).IsModified = true;
             entry.Property(e => e.DateModifiedLocal).IsModified = true;
-            await db.SaveChangesAsync();
+            
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StatusExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return Ok();
         }
 
@@ -246,6 +258,11 @@ namespace Wewy.Controllers
             uiStatus.Text = status.Text;
 
             return Ok(uiStatus);
+        }
+
+        private bool StatusExists(int id)
+        {
+            return db.Groups.Count(e => e.GroupId == id) > 0;
         }
     }
 }

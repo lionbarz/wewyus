@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -15,11 +16,20 @@ namespace Wewy.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        [ResponseType(typeof(List<string>))]
+        /// <summary>
+        /// Return all cities and include the user's city.
+        /// </summary>
+        /// <returns></returns>
+        [ResponseType(typeof(List<UICities>))]
         public async Task<IHttpActionResult> GetCities()
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
             var cities = await db.Cities.ToArrayAsync();
-            return Ok(cities.Select(c => c.Name).ToArray());
+            return Ok(new UICities()
+            {
+                UserCityName = user.CurrentCity.Name,
+                CityNames = cities.Select(c => c.Name).ToList()
+            });
         }
     }
 }

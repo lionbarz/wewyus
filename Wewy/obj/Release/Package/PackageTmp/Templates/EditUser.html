@@ -1,14 +1,23 @@
 ﻿<section id="content">
     <div class="container">
-        <div class="row">
+        <div class="row user-settings-row">
             <div class="col-md-12">
-                <h1>Your Settings</h1>
+                <h3>Your Settings</h3>
                 <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
-                Your city 
+            </div>
+        </div>
+        <div class="row user-settings-row">
+            <div class="col-md-12">
+                <p>Your city</p>
                 <select ng-model="cityName">
                     <option ng-repeat="city in cities">{{city}}</option>
                 </select>
                 <button ng-click="save()">Save</button>
+            </div>
+        </div>
+        <div class="row user-settings-row">
+            <div class="col-md-12">
+                <a href="/Manage">Change login settings.</a>
             </div>
         </div>
     </div>

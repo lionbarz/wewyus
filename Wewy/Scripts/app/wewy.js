@@ -31,11 +31,14 @@ app.config(['$routeProvider',
 app.controller('EditUserCtrl', function ($scope, $http, $window) {
 
     $scope.cities = [];
+    $scope.userCity = "";
     $scope.isSaving = false;
-    $scope.alert = "";
+    $scope.alert = "Loading...";
 
     $http.get("/api/City").success(function (data, status, headers, config) {
-        $scope.cities = data;
+        $scope.alert = "";
+        $scope.cities = data.cityNames;
+        $scope.cityName = data.userCityName;
     }).error(function (data, status, headers, config) {
         $scope.alert = "Oops... something went wrong";
         $scope.working = false;
@@ -45,7 +48,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/User", { "cityName": $scope.cityName }).success(function (data, status, headers, config) {
-            $window.history.back();
+            $scope.alert = "Saved."
             $scope.isSaving = false;
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
@@ -58,7 +61,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
 app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     var dad = 1;
     $scope.isSendingStatus = false;
-    $scope.isLoading = false;
+    $scope.thingsLoading = 0;
     $scope.displayMyStatuses = true;
     $scope.displaySortByDay = false;
     $scope.myUserData = null;
@@ -66,16 +69,15 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.groupId = $routeParams.groupId;
 
     $scope.reload = function () {
-        $scope.isLoading = true;
+        $scope.thingsLoading++;
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
-            $scope.isLoading = false;
+            $scope.thingsLoading--;
             $scope.statuses = data;
             $scope.colorStatuses();
             $scope.updateTimes();
         }).error(function (data, status, headers, config) {
-            $scope.isLoading = false;
-            $scope.title = "Oops... something went wrong";
-            $scope.working = false;
+            $scope.thingsLoading--;
+            $scope.alert = "Oops... something went wrong";
         });
     };
 
@@ -93,8 +95,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
             $scope.colorStatuses();
         }).error(function (data, status, headers, config) {
             $scope.isSendingStatus = false;
-            $scope.title = "Oops... something went wrong";
-            $scope.working = false;
+            $scope.alert = "Oops... something went wrong";
         });
     };
 
@@ -158,7 +159,9 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     $scope.getGroupData = function () {
+        $scope.thingsLoading++;
         $http.get("/api/Group?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
+            $scope.thingsLoading--;
             $scope.group = data;
             $scope.assignMemberColors();
             $scope.hashMembersById();
@@ -166,9 +169,13 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
             $interval($scope.updateUserTime, 10000);
             $scope.reload();
         }).error(function (data, status, headers, config) {
-            $scope.isLoading = false;
-            $scope.title = "Oops... something went wrong";
-            $scope.working = false;
+            $scope.thingsLoading--;
+            if (status == 500) {
+                $scope.alert = "Oops... something went wrong.";
+            }
+            else {
+                $scope.alert = "The group doesn't exist or you don't have access.";
+            }
         });
     }
 
@@ -249,12 +256,20 @@ app.controller('GroupsCtrl', function ($scope, $http, $interval) {
         $http.get("/api/Group").success(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.groups = data;
+            $scope.generateGroupPreview();
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.alert = "Oops... something went wrong";
             $scope.working = false;
         });
     };
+
+    // Make a list of the members as the preview.
+    $scope.generateGroupPreview = function () {
+        for (var group of $scope.groups) {
+            group.preview = group.members.map(function (e) { return e.name; }).join(', ');
+        }
+    }
 
     $scope.load();
 });
@@ -273,12 +288,15 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
                 $scope.newMemberEmail = "";
             }
             else {
-                $scope.alert = $scope.newMemberEmail + " doesn't exist.";
+                $scope.alert = $scope.newMemberEmail + " hasn't registered on this site.";
             } 
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
-            $scope.alert = "Oops... something went wrong";
-            $scope.working = false;
+            if (data && data.message) {
+                $scope.alert = data.message;
+            } else {
+                $scope.alert = "Oops... something went wrong";
+            }
         });
     };
 
@@ -290,6 +308,7 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
         }
 
         $scope.alert = "Creating group...";
+        $scope.isSaving = true;
 
         $http.post("/api/Group", { "name": $scope.groupName, "members": $scope.members }).success(function (data, status, headers, config) {
             if (data.id) {
@@ -302,8 +321,11 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
             }
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
-            $scope.alert = "Oops... something went wrong";
-            $scope.working = false;
+            if (data && data.message) {
+                $scope.alert = data.message;
+            } else {
+                $scope.alert = "Oops... something went wrong";
+            }
         });
     };
 

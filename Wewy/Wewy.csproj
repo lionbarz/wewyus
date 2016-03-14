@@ -219,8 +219,6 @@
     <Compile Include="Controllers\GroupController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\MeController.cs" />
-    <Compile Include="Controllers\RelationshipsController.cs" />
     <Compile Include="Controllers\StatusController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
@@ -239,6 +237,7 @@
     <Compile Include="Models\MeViewModels.cs" />
     <Compile Include="Models\Status.cs" />
     <Compile Include="Models\StatusView.cs" />
+    <Compile Include="Models\UICities.cs" />
     <Compile Include="Models\UIStatusView.cs" />
     <Compile Include="Models\UIGroup.cs" />
     <Compile Include="Models\UserTimeZone.cs" />

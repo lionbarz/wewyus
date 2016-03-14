@@ -1,5 +1,4 @@
 ﻿body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -136,6 +135,10 @@
     margin: 10px 0;
     border: 1px solid black;
     padding: 10px;
+}
+
+.user-settings-row {
+    margin: 10px 0 10px 0;
 }
 
 /* Not designed for larger screen sizes!*/

@@ -44,7 +44,18 @@ namespace Wewy.Controllers
             string userId = User.Identity.GetUserId();
             ApplicationUser me = userService.GetUser(userId);
             Group group = await db.Groups.FindAsync(groupId);
+
+            if (group == null)
+            {
+                return BadRequest("Group does not exist.");
+            }
+
             List<ApplicationUser> members = group.Members;
+
+            if (!members.Any(m => m.Id.Equals(userId)))
+            {
+                return BadRequest("You are not in this group.");
+            }
 
             var uiGroup = new UIGroup()
             {
@@ -67,6 +78,11 @@ namespace Wewy.Controllers
         [ResponseType(typeof(UIGroup))]
         public async Task<IHttpActionResult> PostGroup(UIGroup uiGroup)
         {
+            if (string.IsNullOrEmpty(uiGroup.Name))
+            {
+                return BadRequest("Group name cannot be empty.");
+            }
+
             string myId = User.Identity.GetUserId();
 
             Group group = new Group();
@@ -79,7 +95,21 @@ namespace Wewy.Controllers
             foreach (UIUser user in uiGroup.Members)
             {
                 ApplicationUser appUser = db.Users.Find(user.Id);
-                group.Members.Add(appUser);
+
+                if (appUser == null)
+                {
+                    return BadRequest("The user doesn't exist: " + user.Id);
+                }
+
+                if (!group.Members.Contains(appUser, new ControllerUtils.UserComparer()))
+                {
+                    group.Members.Add(appUser);
+                }
+            }
+
+            if (group.Members.Count < 2)
+            {
+                return BadRequest("Not enough people to form a group.");
             }
 
             db.Groups.Add(group);
