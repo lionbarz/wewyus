@@ -23,6 +23,10 @@ app.config(['$routeProvider',
             templateUrl: 'templates/CreateGroup.html',
             controller: 'CreateGroupCtrl'
         }).
+        when('/EditGroup/:groupId', {
+            templateUrl: 'templates/EditGroup.html',
+            controller: 'EditGroupCtrl'
+        }).
         otherwise({
             redirectTo: '/Groups'
         });
@@ -328,5 +332,38 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
             }
         });
     };
+});
 
+app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams, $window) {
+
+    $scope.group = null;
+
+    $scope.load = function () {
+        $scope.isLoading = true;
+        $scope.alert = "Loading...";
+        $http.get("/api/Group?groupId=" + $routeParams.groupId).success(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.group = data;
+            $scope.alert = "";
+        }).error(function (data, status, headers, config) {
+            $scope.isLoading = false;
+            $scope.alert = "Oops... something went wrong";
+        });
+    };
+
+    $scope.save = function () {
+        $scope.isSaving = true;
+        $scope.alert = "Saving...";
+        $http.put("/api/Group?groupId=" + $routeParams.groupId, $scope.group).success(function (data, status, headers, config) {
+            $scope.alert = "Saved.";
+            $scope.isSaving = false;
+            $window.history.back();
+        }).error(function (data, status, headers, config) {
+            $scope.isSaving = false;
+            $scope.alert = "Oops... something went wrong";
+            $scope.working = false;
+        });
+    };
+
+    $scope.load();
 });

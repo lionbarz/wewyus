@@ -2,7 +2,7 @@
     <div class="container status-container">
         <div class="row group-name-row">
             <div class="col-xs-12">
-                <h3>{{group.name}}</h3>
+                <a ng-href="/#/EditGroup/{{group.id}}"><h3>{{group.name}}</h3></a>
             </div>
             <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
         </div>

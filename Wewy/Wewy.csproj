@@ -318,6 +318,7 @@
     <Content Include="Scripts\app\common.js" />
     <Content Include="Scripts\app\home.viewmodel.js" />
     <Content Include="Templates\CreateGroup.html" />
+    <Content Include="Templates\EditGroup.html" />
     <Content Include="Templates\EditStatus.html" />
     <Content Include="Templates\EditUser.html" />
     <Content Include="Templates\Groups.html" />

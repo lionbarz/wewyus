@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,6 +77,53 @@ namespace Wewy.Controllers
         }
 
         [ResponseType(typeof(UIGroup))]
+        public async Task<IHttpActionResult> PutGroup(int groupId, UIGroup uiGroup)
+        {
+            if (string.IsNullOrEmpty(uiGroup.Name))
+            {
+                return BadRequest("Group name cannot be empty.");
+            }
+
+            string myId = User.Identity.GetUserId();
+
+            Group group = db.Groups.Find(groupId);
+
+            if (group == null)
+            {
+                return BadRequest(string.Format("Group {0} doesn't exist.", groupId));
+            }
+
+            if (!group.Members.Any(m => m.Id.Equals(myId)))
+            {
+                return BadRequest("You are not a member of this group.");
+            }
+
+            group.Name = uiGroup.Name;
+
+            db.Groups.Attach(group);
+            var entry = db.Entry(group);
+            entry.Property(e => e.Name).IsModified = true;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!GroupExists(groupId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(uiGroup);
+        }
+
+        [ResponseType(typeof(UIGroup))]
         public async Task<IHttpActionResult> PostGroup(UIGroup uiGroup)
         {
             if (string.IsNullOrEmpty(uiGroup.Name))
@@ -118,6 +166,11 @@ namespace Wewy.Controllers
             uiGroup.Id = group.GroupId;
 
             return Ok(uiGroup);
+        }
+
+        private bool GroupExists(int id)
+        {
+            return db.Groups.Count(e => e.GroupId == id) > 0;
         }
     }
 }

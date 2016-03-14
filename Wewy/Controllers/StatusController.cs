@@ -262,7 +262,7 @@ namespace Wewy.Controllers
 
         private bool StatusExists(int id)
         {
-            return db.Groups.Count(e => e.GroupId == id) > 0;
+            return db.Status.Count(e => e.StatusId == id) > 0;
         }
     }
 }
