@@ -33,7 +33,7 @@
                 <div class="status-box" ng-style="{ 'border-bottom-color': status.color }" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
                     <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
                         <div class="status-creator-name">{{status.creatorName}}</div>
-                        <div class="status-date" ng-click="status.dateIndex = (status.dateIndex + 1) % status.formattedDates.length">
+                        <div class="status-date" ng-click="status.dateIndex = (status.dateIndex + 1) % status.formattedDates.length; mixpanel.track('Toggle status time');">
                             {{status.formattedDates[status.dateIndex]}}
                         </div>
                         <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">{{status.text}}</div>
@@ -46,3 +46,6 @@
         </div>
     </div>
 </section>
+<script>
+    mixpanel.track("Group page visit");
+</script>
