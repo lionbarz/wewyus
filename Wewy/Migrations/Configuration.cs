@@ -23,6 +23,12 @@ namespace Wewy.Migrations
                 Offset = -8
             };
 
+            UserTimeZone laTzD = new UserTimeZone()
+            {
+                Name = "America/Los_Angeles",
+                Offset = -7
+            };
+
             UserTimeZone beirutTz = new UserTimeZone()
             {
                 Name = "Asia/Beirut",
@@ -72,12 +78,17 @@ namespace Wewy.Migrations
                 new City()
                 {
                     Name = "Los Angeles",
-                    UserTimeZoneId = laTz.UserTimeZoneId
+                    UserTimeZoneId = laTzD.UserTimeZoneId
+                },
+                new City()
+                {
+                    Name = "San Francisco",
+                    UserTimeZoneId = laTzD.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "Seattle",
-                    UserTimeZoneId = laTz.UserTimeZoneId
+                    UserTimeZoneId = laTzD.UserTimeZoneId
                 },
                 new City()
                 {

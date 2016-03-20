@@ -49,6 +49,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
     });
 
     $scope.save = function () {
+        mixpanel.track("Change city");
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/User", { "cityName": $scope.cityName }).success(function (data, status, headers, config) {
@@ -73,6 +74,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.groupId = $routeParams.groupId;
 
     $scope.reload = function () {
+        mixpanel.track("Reload group");
         $scope.thingsLoading++;
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.thingsLoading--;
@@ -86,6 +88,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     };
 
     $scope.submitNewStatus = function () {
+        mixpanel.track("Post new status");
         var text = $scope.newStatusText;
         if (!text) {
             return;
@@ -235,6 +238,7 @@ app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParam
     };
 
     $scope.save = function () {
+        mixpanel.track("Edit status");
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/Status?id=" + $routeParams.statusId, { "text": $scope.newStatusText }).success(function (data, status, headers, config) {
@@ -305,6 +309,8 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
     };
 
     $scope.saveGroup = function () {
+        mixpanel.track("Create group");
+
         if (!$scope.groupName)
         {
             $scope.alert = "Please specify group name.";
@@ -352,6 +358,7 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
     };
 
     $scope.save = function () {
+        mixpanel.track("Change group name");
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/Group?groupId=" + $routeParams.groupId, $scope.group).success(function (data, status, headers, config) {

@@ -66,7 +66,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
 app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     var dad = 1;
     $scope.isSendingStatus = false;
-    $scope.thingsLoading = 0;
+    $scope.isLoading = true;
     $scope.displayMyStatuses = true;
     $scope.displaySortByDay = false;
     $scope.myUserData = null;
@@ -75,14 +75,14 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
 
     $scope.reload = function () {
         mixpanel.track("Reload group");
-        $scope.thingsLoading++;
+        $scope.isLoading = true;
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
-            $scope.thingsLoading--;
+            $scope.isLoading = false;
             $scope.statuses = data;
             $scope.colorStatuses();
             $scope.updateTimes();
         }).error(function (data, status, headers, config) {
-            $scope.thingsLoading--;
+            $scope.isLoading = false;
             $scope.alert = "Oops... something went wrong";
         });
     };
@@ -166,9 +166,8 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     $scope.getGroupData = function () {
-        $scope.thingsLoading++;
+        $scope.isLoading = true;
         $http.get("/api/Group?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
-            $scope.thingsLoading--;
             $scope.group = data;
             $scope.assignMemberColors();
             $scope.hashMembersById();
@@ -176,7 +175,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
             $interval($scope.updateUserTime, 10000);
             $scope.reload();
         }).error(function (data, status, headers, config) {
-            $scope.thingsLoading--;
+            $scope.isLoading = false;
             if (status == 500) {
                 $scope.alert = "Oops... something went wrong.";
             }
@@ -198,7 +197,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
 
     $scope.assignMemberColors = function () {
         // Assign a color to each member and start repeating if more members than colors.
-        var colors = ["darkblue", "darkred",  "darkgoldenrod", "darkolivegreen", "black", "darkgrey"];
+        var colors = ["darkblue", "darkred",  "darkgoldenrod", "darkolivegreen", "pink", "orange"];
         for (var i=0; i < $scope.group.members.length; i++) {
             $scope.group.members[i].color = colors[i % colors.length];
         }
@@ -215,7 +214,14 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
 
     $scope.colorStatuses = function () {
         for (var status of $scope.statuses) {
-            status.color = $scope.group.membersById[status.creatorId].color;
+            var member = $scope.group.membersById[status.creatorId];
+            if (member) {
+                status.color = $scope.group.membersById[status.creatorId].color;
+            }
+            else {
+                // The member has left the group.
+                status.color = "black";
+            }
         }
     }
 
@@ -340,7 +346,7 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
     };
 });
 
-app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams, $window) {
+app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams, $window, $location) {
 
     $scope.group = null;
 
@@ -368,9 +374,29 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
             $scope.alert = "Oops... something went wrong";
-            $scope.working = false;
         });
     };
+
+    $scope.delete = function () {
+        var result = $window.confirm("Are you sure you want to leave this group?");
+        if (result) {
+            $scope.confirmedDelete();
+        }
+    }
+
+    $scope.confirmedDelete = function () {
+        mixpanel.track("Leave group");
+        $scope.isSaving = true;
+        $scope.alert = "Leaving group...";
+        $http.delete("/api/Group/" + $routeParams.groupId, $scope.group).success(function (data, status, headers, config) {
+            $scope.alert = "Group deleted.";
+            $scope.isSaving = false;
+            $location.path("/Groups");
+        }).error(function (data, status, headers, config) {
+            $scope.isSaving = false;
+            $scope.alert = "Oops... something went wrong";
+        });
+    }
 
     $scope.load();
 });

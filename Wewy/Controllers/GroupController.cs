@@ -168,6 +168,50 @@ namespace Wewy.Controllers
             return Ok(uiGroup);
         }
 
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> DeleteGroup(int id)
+        {
+            string myId = User.Identity.GetUserId();
+
+            Group group = db.Groups.Find(id);
+
+            if (group == null)
+            {
+                return BadRequest(string.Format("Group {0} doesn't exist.", id));
+            }
+
+            if (!group.Members.Any(m => m.Id.Equals(myId)))
+            {
+                return BadRequest("You are not a member of this group.");
+            }
+
+            List<ApplicationUser> newMembers = group.Members.Where(x => !x.Id.Equals(myId)).ToList();
+            group.Members = newMembers;
+
+            db.Groups.Attach(group);
+            var entry = db.Entry(group);
+            entry.State = EntityState.Modified;
+            //entry.Property(e => e.Members).IsModified = true;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!GroupExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok();
+        }
+
         private bool GroupExists(int id)
         {
             return db.Groups.Count(e => e.GroupId == id) > 0;
