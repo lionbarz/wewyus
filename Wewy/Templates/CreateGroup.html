@@ -3,17 +3,25 @@
         <div class="row">
             <div class="col-xs-12">
                 <h1>Create Group</h1>
-                <p>{{alert}}</p>
-                <p>Email:</p>
-                <input type="text" ng-model="newMemberEmail"/>
-                <button ng-click="addMember()">Add</button>
-                <p>Members:</p>
-                <div ng-repeat="member in members">
-                    <p>{{member.name}}</p>
+                <div class="alert alert-info" ng-show="alert">{{alert}}</div>
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Group name" ng-model="groupName" />
                 </div>
-                <p>Group name:</p>
-                <input type="text" ng-model="groupName" />
-                <button ng-click="saveGroup()">Done</button>
+                <div class="form-group">
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="member in members">
+                            <button class="badge" ng-click="removeMember(member)">Remove</button>
+                            {{member.name}}
+                        </li>
+                    </ul>
+                    <div class="input-group">
+                        <input class="form-control" type="email" placeholder="E-mail address" ng-model="newMemberEmail" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" ng-click="addMember()">Add</button>
+                        </span>
+                    </div>
+                </div>
+                <button class="btn btn-default" ng-click="saveGroup()" ng-disabled="!isValid()">Create</button>
             </div>
         </div>
     </div>

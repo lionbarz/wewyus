@@ -292,8 +292,43 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
 
     $scope.members = [];
     $scope.alert = "";
+    $scope.user = null;
+
+    var memberExists = function (email) {
+        for (var member of $scope.members) {
+            if (member.email === email) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+
+    $http.get("/api/User").success(function (data, status, headers, config) {
+        user = data;
+    }).error(function (data, status, headers, config) {
+        // The user is only used to not let the user add himself to the group.
+        // No big deal if it doesn't fail. We don't need to show an error message.
+    });
 
     $scope.addMember = function () {
+        if (!$scope.newMemberEmail) {
+            $scope.alert = "Please enter the email of the person you wish to add to the group.";
+            return;
+        }
+
+        if (memberExists($scope.newMemberEmail)) {
+            $scope.alert = "You added that person already.";
+            $scope.newMemberEmail = "";
+            return;
+        }
+
+        if (user && user.email === $scope.newMemberEmail) {
+            $scope.alert = "You are a member of this group because you are creating it.";
+            $scope.newMemberEmail = "";
+            return;
+        }
+
         $scope.alert = "Adding...";
         $http.get("/api/User?email=" + encodeURI($scope.newMemberEmail)).success(function (data, status, headers, config) {
             if (data.name) {
@@ -314,12 +349,31 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
         });
     };
 
+    $scope.removeMember = function (member) {
+        var index = $scope.members.indexOf(member);
+        if (index > -1) {
+            $scope.members.splice(index, 1);
+        }
+    }
+
+    $scope.isValid = function () {
+        return $scope.groupName &&
+            $scope.members.length > 0 &&
+            !($scope.newMemberEmail && $scope.newMemberEmail.length > 0);
+    }
+
     $scope.saveGroup = function () {
         mixpanel.track("Create group");
 
         if (!$scope.groupName)
         {
-            $scope.alert = "Please specify group name.";
+            $scope.alert = "Please specify a name for the group.";
+            return;
+        }
+
+        if ($scope.members.length < 1)
+        {
+            $scope.alert = "Please add someone to the group.";
             return;
         }
 
@@ -349,7 +403,7 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
 app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams, $window, $location) {
 
     $scope.group = null;
-
+    
     $scope.load = function () {
         $scope.isLoading = true;
         $scope.alert = "Loading...";

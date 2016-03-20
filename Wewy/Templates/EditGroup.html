@@ -4,10 +4,13 @@
             <div class="col-xs-12">
                 <h1>Edit Group</h1>
                 <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
-                Name: <input ng-model="group.name" />
-                <button ng-click="save()">YA2</button>
+                <div class="input-group">
+                    <input class="form-control" type="text" ng-model="group.name" />
+                </div>
                 <hr />
-                <p><button ng-click="delete()">Leave this group</button></p>
+                <button class="btn btn-default" ng-click="save()">Save</button>
+                <hr />
+                <button class="btn btn-default" ng-click="delete()">Leave this group</button>
             </div>
         </div>
     </div>
