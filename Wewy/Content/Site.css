@@ -141,6 +141,11 @@
     margin: 10px 0 10px 0;
 }
 
+.group-admin-label {
+    color: red;
+    margin-left: 5px;
+}
+
 /* Not designed for larger screen sizes!*/
 @media screen and (min-width: 620px) {
     .status-container {

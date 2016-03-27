@@ -2,10 +2,35 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>Edit Group</h1>
-                <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
-                Name: <input ng-model="group.name" />
-                <button ng-click="save()">YA2</button>
+                <h1>{{title}}</h1>
+                <div class="alert alert-info" ng-show="alert">{{alert}}</div>
+            </div>
+        </div>
+        <div class="row" ng-hide="isLoading">
+            <div class="col-xs-12">
+                <div class="alert alert-warning" ng-show="isModified">You haven't saved your changes yet.</div>
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Group name" ng-model="group.name" ng-change="isModified = true" />
+                </div>
+                <div class="form-group">
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="member in group.members">
+                            <button class="badge" ng-click="removeMember(member)" ng-show="group.isUserAdmin && !member.isAdmin">Remove</button>
+                            {{member.name}}
+                            <span class="group-admin-label" ng-show="member.isAdmin">(group admin)</span>
+                        </li>
+                    </ul>
+                    <div class="input-group" ng-show="group.isUserAdmin">
+                        <input class="form-control" type="email" placeholder="E-mail address" ng-model="newMemberEmail" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" ng-click="addMember()">Add</button>
+                        </span>
+                    </div>
+                </div>
+                <button class="btn btn-default" ng-click="save()" ng-disabled="!isValid()">{{saveButtonTitle}}</button>
+                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                <hr />
+                <button class="btn btn-danger" ng-click="delete()" ng-show="isEditMode">Leave this group</button>
             </div>
         </div>
     </div>

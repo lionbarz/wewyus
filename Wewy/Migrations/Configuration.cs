@@ -55,7 +55,7 @@ namespace Wewy.Migrations
 
             context.UserTimeZones.AddOrUpdate(
                 p => p.Name,
-                laTz,
+                laTzD,
                 beirutTz,
                 chicagoTz,
                 tokyoTz,

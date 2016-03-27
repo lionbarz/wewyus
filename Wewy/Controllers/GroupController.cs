@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -29,6 +30,7 @@ namespace Wewy.Controllers
                 {
                     Id = x.GroupId,
                     Name = x.Name,
+                    IsUserAdmin = x.AdminId != null && x.AdminId.Equals(userId),
                     Members = x.Members.Select(
                         m => new UIUser()
                         {
@@ -62,6 +64,8 @@ namespace Wewy.Controllers
             {
                 Name = group.Name,
                 Id = group.GroupId,
+                Admin = group.Admin == null ? null : new UIUser(group.Admin),
+                IsUserAdmin = group.AdminId != null && group.AdminId.Equals(userId),
                 Members = members.Select(
                     x => new UIUser()
                     {
@@ -76,6 +80,12 @@ namespace Wewy.Controllers
             return Ok(uiGroup);
         }
 
+        /// <summary>
+        /// Just let you rename a group right now.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="uiGroup"></param>
+        /// <returns></returns>
         [ResponseType(typeof(UIGroup))]
         public async Task<IHttpActionResult> PutGroup(int groupId, UIGroup uiGroup)
         {
@@ -97,13 +107,25 @@ namespace Wewy.Controllers
             {
                 return BadRequest("You are not a member of this group.");
             }
-
-            group.Name = uiGroup.Name;
-
-            db.Groups.Attach(group);
-            var entry = db.Entry(group);
-            entry.Property(e => e.Name).IsModified = true;
-
+         
+            if (group.AdminId.Equals(myId))
+            {
+                group.Name = uiGroup.Name;             
+                ApplicationUser me = db.Users.Find(myId);
+                group.Members = MakeGroupMembersList(me, uiGroup.Members);
+                db.Groups.Attach(group);
+                var entry = db.Entry(group);
+                entry.State = EntityState.Modified;
+            }
+            else
+            {
+                // Non-admins can only change the group name.
+                group.Name = uiGroup.Name;
+                db.Groups.Attach(group);
+                var entry = db.Entry(group);
+                entry.Property(e => e.Name).IsModified = true;
+            }
+            
             try
             {
                 await db.SaveChangesAsync();
@@ -132,33 +154,27 @@ namespace Wewy.Controllers
             }
 
             string myId = User.Identity.GetUserId();
+            ApplicationUser me = db.Users.Find(myId);
 
             Group group = new Group();
             group.Name = uiGroup.Name;
-            group.Members = new List<ApplicationUser>()
-            {
-                db.Users.Find(myId)
-            };
-            
-            foreach (UIUser user in uiGroup.Members)
-            {
-                ApplicationUser appUser = db.Users.Find(user.Id);
 
-                if (appUser == null)
-                {
-                    return BadRequest("The user doesn't exist: " + user.Id);
-                }
-
-                if (!group.Members.Contains(appUser, new ControllerUtils.UserComparer()))
-                {
-                    group.Members.Add(appUser);
-                }
+            try
+            {
+                group.Members = MakeGroupMembersList(me, uiGroup.Members);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
             }
 
             if (group.Members.Count < 2)
             {
                 return BadRequest("Not enough people to form a group.");
             }
+
+            group.AdminId = myId;
+            group.Admin = me;
 
             db.Groups.Add(group);
             await db.SaveChangesAsync();
@@ -168,6 +184,34 @@ namespace Wewy.Controllers
             return Ok(uiGroup);
         }
 
+        private List<ApplicationUser> MakeGroupMembersList(ApplicationUser me, List<UIUser> uiMembers)
+        {
+            
+            List<ApplicationUser> members = new List<ApplicationUser>() { me };
+
+            foreach (UIUser user in uiMembers)
+            {
+                ApplicationUser appUser = db.Users.Find(user.Id);
+
+                if (appUser == null)
+                {
+                    throw new ArgumentException("The user doesn't exist: " + user.Id);
+                }
+
+                if (!members.Contains(appUser, new ControllerUtils.UserComparer()))
+                {
+                    members.Add(appUser);
+                }
+            }
+
+            return members;
+        }
+
+        /// <summary>
+        /// Just leaves the group, ie removes user from members list.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> DeleteGroup(int id)
         {
@@ -188,10 +232,17 @@ namespace Wewy.Controllers
             List<ApplicationUser> newMembers = group.Members.Where(x => !x.Id.Equals(myId)).ToList();
             group.Members = newMembers;
 
+            // If user is group admin, assign a random admin (like WhatsApp).
+            if (group.AdminId != null && group.AdminId.Equals(myId) && group.Members.Count > 0)
+            {
+                ApplicationUser newAdmin = group.Members[0];
+                group.AdminId = newAdmin.Id;
+                group.Admin = newAdmin;
+            }
+
             db.Groups.Attach(group);
             var entry = db.Entry(group);
             entry.State = EntityState.Modified;
-            //entry.Property(e => e.Members).IsModified = true;
 
             try
             {

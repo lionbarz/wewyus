@@ -20,7 +20,7 @@ app.config(['$routeProvider',
             controller: 'GroupsCtrl'
         }).
         when('/CreateGroup', {
-            templateUrl: 'templates/CreateGroup.html',
+            templateUrl: 'templates/EditGroup.html',
             controller: 'CreateGroupCtrl'
         }).
         when('/EditGroup/:groupId', {
@@ -288,28 +288,19 @@ app.controller('GroupsCtrl', function ($scope, $http, $interval) {
     $scope.load();
 });
 
-app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location) {
-
-    $scope.members = [];
-    $scope.alert = "";
+app.controller('EditGroupCtrlBase', function ($scope, $http, $interval, $routeParams, $window, $location) {
     $scope.user = null;
+    $scope.group = null;
+    $scope.isModified = false;
 
     var memberExists = function (email) {
-        for (var member of $scope.members) {
+        for (var member of $scope.group.members) {
             if (member.email === email) {
                 return true;
             }
         }
         return false;
     };
-
-
-    $http.get("/api/User").success(function (data, status, headers, config) {
-        user = data;
-    }).error(function (data, status, headers, config) {
-        // The user is only used to not let the user add himself to the group.
-        // No big deal if it doesn't fail. We don't need to show an error message.
-    });
 
     $scope.addMember = function () {
         if (!$scope.newMemberEmail) {
@@ -323,8 +314,8 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
             return;
         }
 
-        if (user && user.email === $scope.newMemberEmail) {
-            $scope.alert = "You are a member of this group because you are creating it.";
+        if ($scope.user && $scope.user.email === $scope.newMemberEmail) {
+            $scope.alert = "You are already a member of this group.";
             $scope.newMemberEmail = "";
             return;
         }
@@ -332,15 +323,15 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
         $scope.alert = "Adding...";
         $http.get("/api/User?email=" + encodeURI($scope.newMemberEmail)).success(function (data, status, headers, config) {
             if (data.name) {
-                $scope.members.push(data);
+                $scope.group.members.push(data);
+                $scope.isModified = true;
                 $scope.alert = "";
                 $scope.newMemberEmail = "";
             }
             else {
                 $scope.alert = $scope.newMemberEmail + " hasn't registered on this site.";
-            } 
+            }
         }).error(function (data, status, headers, config) {
-            $scope.isLoading = false;
             if (data && data.message) {
                 $scope.alert = data.message;
             } else {
@@ -350,29 +341,43 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
     };
 
     $scope.removeMember = function (member) {
-        var index = $scope.members.indexOf(member);
+        var index = $scope.group.members.indexOf(member);
         if (index > -1) {
-            $scope.members.splice(index, 1);
+            $scope.isModified = true;
+            $scope.group.members.splice(index, 1);
         }
     }
 
     $scope.isValid = function () {
-        return $scope.groupName &&
-            $scope.members.length > 0 &&
+        return $scope.group &&
+            $scope.group.name &&
+            $scope.group.members.length > 0 &&
             !($scope.newMemberEmail && $scope.newMemberEmail.length > 0);
     }
 
-    $scope.saveGroup = function () {
+    $scope.cancel = function () {
+        $window.history.back();
+    }
+});
+
+app.controller('CreateGroupCtrl', function ($scope, $controller, $http, $interval, $routeParams, $window, $location) {
+    $controller('EditGroupCtrlBase', { $scope: $scope });
+    $scope.isEditMode = false;
+    $scope.title = "Create Group";
+    $scope.saveButtonTitle = "Create";
+    $scope.alert = "";
+    $scope.group = { members: [], isUserAdmin: true };
+    $scope.isLoading = false;
+
+    $scope.save = function () {
         mixpanel.track("Create group");
 
-        if (!$scope.groupName)
-        {
+        if (!$scope.group.name) {
             $scope.alert = "Please specify a name for the group.";
             return;
         }
 
-        if ($scope.members.length < 1)
-        {
+        if ($scope.group.members.length < 1) {
             $scope.alert = "Please add someone to the group.";
             return;
         }
@@ -380,10 +385,11 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
         $scope.alert = "Creating group...";
         $scope.isSaving = true;
 
-        $http.post("/api/Group", { "name": $scope.groupName, "members": $scope.members }).success(function (data, status, headers, config) {
+        $http.post("/api/Group", $scope.group).success(function (data, status, headers, config) {
             if (data.id) {
                 $scope.alert = "Saved.";
                 $scope.isSaving = false;
+                $scope.isModified = false;
                 $location.path("/Group/" + data.id);
             } else {
                 $scope.alert = "Something went wrong.";
@@ -400,9 +406,13 @@ app.controller('CreateGroupCtrl', function ($scope, $http, $interval, $location)
     };
 });
 
-app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams, $window, $location) {
-
-    $scope.group = null;
+app.controller('EditGroupCtrl', function ($scope, $controller, $http, $interval, $routeParams, $window, $location) {
+    $controller('EditGroupCtrlBase', { $scope: $scope });
+    $scope.isEditMode = true;
+    $scope.title = "Edit Group";
+    $scope.saveButtonTitle = "Save";
+    $scope.alert = "";
+    $scope.isLoading = true;
     
     $scope.load = function () {
         $scope.isLoading = true;
@@ -411,6 +421,11 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
             $scope.isLoading = false;
             $scope.group = data;
             $scope.alert = "";
+            for (var mem of $scope.group.members) {
+                if ($scope.group.admin && mem.id === $scope.group.admin.id) {
+                    mem.isAdmin = true;
+                }
+            }
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.alert = "Oops... something went wrong";
@@ -418,12 +433,13 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
     };
 
     $scope.save = function () {
-        mixpanel.track("Change group name");
+        mixpanel.track("Edit group");
         $scope.isSaving = true;
         $scope.alert = "Saving...";
         $http.put("/api/Group?groupId=" + $routeParams.groupId, $scope.group).success(function (data, status, headers, config) {
             $scope.alert = "Saved.";
             $scope.isSaving = false;
+            $scope.isModified = false;
             $window.history.back();
         }).error(function (data, status, headers, config) {
             $scope.isSaving = false;
@@ -443,7 +459,7 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
         $scope.isSaving = true;
         $scope.alert = "Leaving group...";
         $http.delete("/api/Group/" + $routeParams.groupId, $scope.group).success(function (data, status, headers, config) {
-            $scope.alert = "Group deleted.";
+            $scope.alert = "You have left this group.";
             $scope.isSaving = false;
             $location.path("/Groups");
         }).error(function (data, status, headers, config) {
@@ -451,6 +467,13 @@ app.controller('EditGroupCtrl', function ($scope, $http, $interval, $routeParams
             $scope.alert = "Oops... something went wrong";
         });
     }
+
+    $http.get("/api/User").success(function (data, status, headers, config) {
+        $scope.user = data;
+    }).error(function (data, status, headers, config) {
+        // The user is only used to not let the user add himself to the group.
+        // No big deal if it fails. We don't need to show an error message.
+    });
 
     $scope.load();
 });

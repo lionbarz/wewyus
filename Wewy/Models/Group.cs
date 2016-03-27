@@ -12,6 +12,8 @@ namespace Wewy.Models
     {
         public int GroupId { get; set; }
         public string Name { get; set; }
+        public string AdminId { get; set; }
+        public virtual ApplicationUser Admin { get; set; }
         public virtual List<ApplicationUser> Members { get; set; }
         public virtual List<Status> Statuses { get; set; }
     }

@@ -26,6 +26,9 @@ namespace Wewy.Models
 
         [InverseProperty("Members")]
         public virtual List<Group> Groups { get; set; }
+
+        [InverseProperty("Admin")]
+        public virtual List<Group> GroupsAdministering { get; set; }
         
         [InverseProperty("Creator")]
         public virtual List<Status> CreatedStatuses { get; set; }

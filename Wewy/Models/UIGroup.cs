@@ -9,6 +9,8 @@ namespace Wewy.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public UIUser Admin { get; set; }
         public List<UIUser> Members { get; set; }
+        public bool IsUserAdmin { get; set; }
     }
 }
