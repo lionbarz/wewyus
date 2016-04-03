@@ -46,6 +46,7 @@ namespace Wewy.Controllers
         public async Task<IHttpActionResult> GetStatuses(int groupId)
         {
             string userId = User.Identity.GetUserId();
+            ApplicationUser me = db.Users.Find(userId);
 
             Group group = await db.Groups.FindAsync(groupId);
 
@@ -84,6 +85,28 @@ namespace Wewy.Controllers
                     IsCreatedByUser = s.Creator.UserName.Equals(myName),
                     Views = ControllerUtils.GetUIViews(s.StatusViews)
                 }).ToArray();
+
+            // Record group visit.
+            LastGroupVisit lastVisit = me.LastGroupVisits.Where(x => x.GroupId == groupId).FirstOrDefault();
+            if (lastVisit == null)
+            {
+                db.LastGroupVisits.Add(new LastGroupVisit()
+                {
+                    GroupId = groupId,
+                    Group = group,
+                    Visitor = me,
+                    VisitorId = me.Id,
+                    VisitTimeUtc = DateTime.UtcNow
+                });
+                await db.SaveChangesAsync();
+            }
+            else
+            {
+                lastVisit.VisitTimeUtc = DateTime.UtcNow;
+                db.LastGroupVisits.Attach(lastVisit);
+                db.Entry(lastVisit).Property(x => x.VisitTimeUtc).IsModified = true;
+                await db.SaveChangesAsync();
+            }
 
             return Ok(uiStatuses);
         }

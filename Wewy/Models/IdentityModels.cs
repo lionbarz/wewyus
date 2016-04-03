@@ -37,6 +37,9 @@ namespace Wewy.Models
 
         [ForeignKey("CurrentCityId")]
         public virtual City CurrentCity { get; set; }
+
+        [InverseProperty("Visitor")]
+        public virtual List<LastGroupVisit> LastGroupVisits { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -64,5 +67,7 @@ namespace Wewy.Models
         public DbSet<UserTimeZone> UserTimeZones { get; set; }
 
         public DbSet<City> Cities { get; set; }
+
+        public DbSet<LastGroupVisit> LastGroupVisits { get; set; }
     }
 }

@@ -19,26 +19,35 @@ namespace Wewy.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserService userService = new UserService();
 
-        // Just return the id, name and names and ids of the members in the group info.
+        // Return the id, name and names and ids of the members in the group info
+        // and the number of unread messages.
         [ResponseType(typeof(List<UIGroup>))]
         public IHttpActionResult GetGroups()
         {
             string userId = User.Identity.GetUserId();
             ApplicationUser me = userService.GetUser(userId);
-            var groups = me.Groups.Select(
-                x => new UIGroup()
+            List<UIGroup> uiGroups = new List<UIGroup>();
+
+            foreach (Group group in me.Groups)
+            {
+                UIGroup uiGroup = new UIGroup()
                 {
-                    Id = x.GroupId,
-                    Name = x.Name,
-                    IsUserAdmin = x.AdminId != null && x.AdminId.Equals(userId),
-                    Members = x.Members.Select(
+                    Id = group.GroupId,
+                    Name = group.Name,
+                    IsUserAdmin = group.AdminId != null && group.AdminId.Equals(userId),
+                    Members = group.Members.Select(
                         m => new UIUser()
                         {
                             Id = m.Id,
                             Name = m.Nickname
                         }).ToList()
-                }).ToList();
-            return Ok(groups);
+                };
+
+                uiGroup.NumberOfNewPosts = FindNumberOfUnreadMessages(me, group);
+                uiGroups.Add(uiGroup);
+            }
+
+            return Ok(uiGroups);
         }
 
         [ResponseType(typeof(UIGroup))]
@@ -76,6 +85,8 @@ namespace Wewy.Controllers
                         TimeZoneName = x.CurrentCity.UserTimeZone.JavascriptName
                     }).ToList()
             };
+
+            uiGroup.NumberOfNewPosts = FindNumberOfUnreadMessages(me, group);
 
             return Ok(uiGroup);
         }
@@ -266,6 +277,20 @@ namespace Wewy.Controllers
         private bool GroupExists(int id)
         {
             return db.Groups.Count(e => e.GroupId == id) > 0;
+        }
+
+        private int FindNumberOfUnreadMessages(ApplicationUser me, Group group)
+        {
+            // Find number of unread messages.
+            LastGroupVisit lastVisit = me.LastGroupVisits.Where(x => x.GroupId == group.GroupId).FirstOrDefault();
+            if (lastVisit == null)
+            {
+                return group.Statuses.Count();
+            }
+            else
+            {
+                return group.Statuses.Where(x => x.DateCreatedUtc > lastVisit.VisitTimeUtc).Count();
+            }
         }
     }
 }

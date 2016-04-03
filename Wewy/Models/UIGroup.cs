@@ -12,5 +12,6 @@ namespace Wewy.Models
         public UIUser Admin { get; set; }
         public List<UIUser> Members { get; set; }
         public bool IsUserAdmin { get; set; }
+        public int NumberOfNewPosts { get; set; }
     }
 }
