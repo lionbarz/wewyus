@@ -33,7 +33,7 @@ namespace Wewy.Controllers
                 Name = appUser.Nickname,
                 Email = appUser.Email,
                 CityName = appUser.CurrentCity.Name,
-                TimeZoneName = appUser.CurrentCity.UserTimeZone.Name
+                TimeZoneName = appUser.CurrentCity.UserTimeZone.JavascriptName
             };
 
             return Ok(user);
@@ -63,7 +63,7 @@ namespace Wewy.Controllers
                 Name = appUser.Nickname,
                 Email = appUser.Email,
                 CityName = appUser.CurrentCity.Name,
-                TimeZoneName = appUser.CurrentCity.UserTimeZone.Name
+                TimeZoneName = appUser.CurrentCity.UserTimeZone.JavascriptName
             };
 
             return Ok(user);

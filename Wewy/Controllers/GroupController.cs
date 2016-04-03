@@ -73,7 +73,7 @@ namespace Wewy.Controllers
                         Name = x.Nickname,
                         CityName = x.CurrentCity.Name,
                         Email = x.Email,
-                        TimeZoneName = x.CurrentCity.UserTimeZone.Name
+                        TimeZoneName = x.CurrentCity.UserTimeZone.JavascriptName
                     }).ToList()
             };
 

@@ -38,21 +38,22 @@ namespace Wewy.Controllers
 
         internal static List<StatusView> MakeStatusViews(string userId, Group group, Status status, DateTime utc)
         {
-            DateTimeOffset dateUtcOffset = new DateTimeOffset(utc);
+            var utcOffset = new DateTimeOffset(utc, TimeSpan.Zero);
             List<StatusView> views = new List<StatusView>();
 
             foreach (ApplicationUser viewer in group.Members)
             {
-                // Offset in hours.
-                TimeSpan offset = new TimeSpan(viewer.CurrentCity.UserTimeZone.Offset, 0, 0);
-                DateTimeOffset dateOffset = dateUtcOffset.ToOffset(offset);
+                // Calculate user's local time.
+                var tz = TimeZoneInfo.FindSystemTimeZoneById(viewer.CurrentCity.UserTimeZone.WindowsRegistryName);
+                DateTimeOffset userLocalDateOffset = utcOffset.ToOffset(tz.GetUtcOffset(utcOffset));
+
                 views.Add(new StatusView()
                 {
                     ViewerId = viewer.Id,
                     Viewer = viewer,
                     City = viewer.CurrentCity,
                     CityId = viewer.CurrentCityId,
-                    LocalTime = dateOffset.DateTime,
+                    LocalTime = userLocalDateOffset.DateTime,
                     Status = status,
                     StatusId = status.StatusId
                 });

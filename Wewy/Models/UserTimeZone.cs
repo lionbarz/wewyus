@@ -8,8 +8,8 @@ namespace Wewy.Models
     public class UserTimeZone
     {
         public int UserTimeZoneId { get; set; }
-        public string Name { get; set; }
-        public int Offset { get; set; }
+        public string JavascriptName { get; set; }
+        public string WindowsRegistryName { get; set; }
 
         public virtual List<City> Cities { get; set; }
     }

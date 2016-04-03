@@ -232,6 +232,10 @@
     <Compile Include="Migrations\201603210503470_GroupAdmins.Designer.cs">
       <DependentUpon>201603210503470_GroupAdmins.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201604021824062_TimeZone.cs" />
+    <Compile Include="Migrations\201604021824062_TimeZone.Designer.cs">
+      <DependentUpon>201604021824062_TimeZone.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\City.cs" />
@@ -381,6 +385,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201603210503470_GroupAdmins.resx">
       <DependentUpon>201603210503470_GroupAdmins.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604021824062_TimeZone.resx">
+      <DependentUpon>201604021824062_TimeZone.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

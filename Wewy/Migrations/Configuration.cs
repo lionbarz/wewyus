@@ -19,43 +19,37 @@ namespace Wewy.Migrations
 
             UserTimeZone laTz = new UserTimeZone()
             {
-                Name = "America/Los_Angeles",
-                Offset = -8
-            };
-
-            UserTimeZone laTzD = new UserTimeZone()
-            {
-                Name = "America/Los_Angeles",
-                Offset = -7
+                JavascriptName = "America/Los_Angeles",
+                WindowsRegistryName = "Pacific Standard Time"
             };
 
             UserTimeZone beirutTz = new UserTimeZone()
             {
-                Name = "Asia/Beirut",
-                Offset = 2
+                JavascriptName = "Asia/Beirut",
+                WindowsRegistryName = "Jordan Standard Time"
             };
 
             UserTimeZone chicagoTz = new UserTimeZone
             {
-                Name = "America/Chicago",
-                Offset = -6
+                JavascriptName = "America/Chicago",
+                WindowsRegistryName = "Central Standard Time"
             };
 
             UserTimeZone tokyoTz = new UserTimeZone
             {
-                Name = "Asia/Tokyo",
-                Offset = 9
+                JavascriptName = "Asia/Tokyo",
+                WindowsRegistryName = "Tokyo Standard Time"
             };
 
             UserTimeZone seoulTz = new UserTimeZone
             {
-                Name = "Asia/Seoul",
-                Offset = 9
+                JavascriptName = "Asia/Seoul",
+                WindowsRegistryName = "Korea Standard Time"
             };
 
             context.UserTimeZones.AddOrUpdate(
-                p => p.Name,
-                laTzD,
+                p => p.JavascriptName,
+                laTz,
                 beirutTz,
                 chicagoTz,
                 tokyoTz,
@@ -78,27 +72,27 @@ namespace Wewy.Migrations
                 new City()
                 {
                     Name = "Los Angeles",
-                    UserTimeZoneId = laTzD.UserTimeZoneId
+                    UserTimeZoneId = laTz.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "San Francisco",
-                    UserTimeZoneId = laTzD.UserTimeZoneId
+                    UserTimeZoneId = laTz.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "Seattle",
-                    UserTimeZoneId = laTzD.UserTimeZoneId
+                    UserTimeZoneId = laTz.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "Seoul",
-                    UserTimeZoneId = chicagoTz.UserTimeZoneId
+                    UserTimeZoneId = seoulTz.UserTimeZoneId
                 },
                 new City()
                 {
                     Name = "Tokyo",
-                    UserTimeZoneId = chicagoTz.UserTimeZoneId
+                    UserTimeZoneId = tokyoTz.UserTimeZoneId
                 },
                 new City()
                 {

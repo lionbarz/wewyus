@@ -159,13 +159,11 @@ namespace Wewy.Controllers
 
             ApplicationUser applicationUser = db.Users.Find(userId);
 
-            // Offset in hours.
-            TimeSpan offset = new TimeSpan(applicationUser.CurrentCity.UserTimeZone.Offset, 0, 0);
-
             DateTime utc = DateTime.UtcNow;
-            DateTimeOffset dateUtcOffset = new DateTimeOffset(utc);
-            DateTimeOffset dateLocalOffset = dateUtcOffset.ToOffset(offset);
-            DateTime localTime = dateLocalOffset.DateTime;
+            DateTimeOffset dateUtcOffset = new DateTimeOffset(utc, TimeSpan.Zero);
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(applicationUser.CurrentCity.UserTimeZone.WindowsRegistryName);
+            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(tz.GetUtcOffset(dateUtcOffset));
+            DateTime localTime = userLocalDateOffset.DateTime;
 
             if (status.Creator.Id != userId)
             {
@@ -220,13 +218,11 @@ namespace Wewy.Controllers
 
             ApplicationUser applicationUser = db.Users.Find(userId);
 
-            // Offset in hours.
-            TimeSpan offset = new TimeSpan(applicationUser.CurrentCity.UserTimeZone.Offset, 0, 0);
-
             DateTime utc = DateTime.UtcNow;
-            DateTimeOffset dateUtcOffset = new DateTimeOffset(utc);
-            DateTimeOffset dateLocalOffset = dateUtcOffset.ToOffset(offset);
-            DateTime localTime = dateLocalOffset.DateTime;
+            DateTimeOffset dateUtcOffset = new DateTimeOffset(utc, TimeSpan.Zero);
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(applicationUser.CurrentCity.UserTimeZone.WindowsRegistryName);
+            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(tz.GetUtcOffset(dateUtcOffset));
+            DateTime localTime = userLocalDateOffset.DateTime;
 
             Status status = new Status()
             {

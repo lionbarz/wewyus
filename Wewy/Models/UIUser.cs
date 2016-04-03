@@ -13,7 +13,7 @@ namespace Wewy.Models
             this.Name = me.Nickname;
             this.Email = me.Email;
             this.CityName = me.CurrentCity.Name;
-            this.TimeZoneName = me.CurrentCity.UserTimeZone.Name;
+            this.TimeZoneName = me.CurrentCity.UserTimeZone.JavascriptName;
         }
 
         public UIUser()
