@@ -79,3 +79,4 @@ C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wew
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.init.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.GroupAdmins.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.TimeZone.resources
+C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Release\Wewy.Migrations.GroupVisits.resources

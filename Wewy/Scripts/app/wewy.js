@@ -100,9 +100,6 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
             $scope.updateTimes();
             $scope.isSendingStatus = false;
             $scope.colorStatuses();
-            // Reload to mark the thread as read so user's own status doesn't count
-            // towards unread messages.
-            $scope.reload();
         }).error(function (data, status, headers, config) {
             $scope.isSendingStatus = false;
             $scope.alert = "Oops... something went wrong";

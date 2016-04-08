@@ -146,6 +146,10 @@
     margin-left: 5px;
 }
 
+.groups-new-posts-label {
+    font-weight: bold;
+}
+
 /* Not designed for larger screen sizes!*/
 @media screen and (min-width: 620px) {
     .status-container {

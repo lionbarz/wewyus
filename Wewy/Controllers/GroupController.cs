@@ -282,14 +282,18 @@ namespace Wewy.Controllers
         private int FindNumberOfUnreadMessages(ApplicationUser me, Group group)
         {
             // Find number of unread messages.
-            LastGroupVisit lastVisit = me.LastGroupVisits.Where(x => x.GroupId == group.GroupId).FirstOrDefault();
+            LastGroupVisit lastVisit = me.LastGroupVisits
+                .Where(x => x.GroupId == group.GroupId)
+                .FirstOrDefault();
             if (lastVisit == null)
             {
                 return group.Statuses.Count();
             }
             else
             {
-                return group.Statuses.Where(x => x.DateCreatedUtc > lastVisit.VisitTimeUtc).Count();
+                return group.Statuses
+                    .Where(x => x.DateCreatedUtc > lastVisit.VisitTimeUtc && !x.CreatorId.Equals(me.Id))
+                    .Count();
             }
         }
     }

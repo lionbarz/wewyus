@@ -20,6 +20,7 @@
                 <div>
                     <a ng-href="/#Group/{{group.id}}">{{group.name}}</a>
                     <div>{{group.preview}}</div>
+                    <div class="groups-new-posts-label" ng-show="group.numberOfNewPosts > 0">{{group.numberOfNewPosts}} unread post(s)</div>
                 </div>
             </div>
         </div>
