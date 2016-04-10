@@ -168,7 +168,7 @@ namespace Wewy.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     Hometown = "N/A",
-                    CurrentCityId = model.HometownId,
+                    TimezoneOffsetMinutes = model.TimezoneOffsetMinutes,
                     Nickname = model.Nickname
                 };
 
@@ -393,7 +393,7 @@ namespace Wewy.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     Hometown = "Alloub Hamayt",
-                    CurrentCityId = model.HometownId,
+                    TimezoneOffsetMinutes = model.TimezoneOffsetMinutes,
                     Nickname = model.Nickname
                 };
 

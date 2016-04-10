@@ -213,8 +213,8 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Common\Constants.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\CityController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Controllers\GroupController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -240,26 +240,34 @@
     <Compile Include="Migrations\201604030553368_GroupVisits.Designer.cs">
       <DependentUpon>201604030553368_GroupVisits.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201604100807331_AutoTimezone.cs" />
+    <Compile Include="Migrations\201604100807331_AutoTimezone.Designer.cs">
+      <DependentUpon>201604100807331_AutoTimezone.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604100834436_RemoveCityId.cs" />
+    <Compile Include="Migrations\201604100834436_RemoveCityId.Designer.cs">
+      <DependentUpon>201604100834436_RemoveCityId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\City.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\LastGroupVisit.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Location.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MeViewModels.cs" />
+    <Compile Include="Models\Position.cs" />
     <Compile Include="Models\Status.cs" />
     <Compile Include="Models\StatusView.cs" />
-    <Compile Include="Models\UICities.cs" />
+    <Compile Include="Models\UIStatusPost.cs" />
     <Compile Include="Models\UIStatusView.cs" />
     <Compile Include="Models\UIGroup.cs" />
-    <Compile Include="Models\UserTimeZone.cs" />
     <Compile Include="Models\UIStatus.cs" />
     <Compile Include="Models\UIUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
-    <Compile Include="Services\CityService.cs" />
+    <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -396,6 +404,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201604030553368_GroupVisits.resx">
       <DependentUpon>201604030553368_GroupVisits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604100807331_AutoTimezone.resx">
+      <DependentUpon>201604100807331_AutoTimezone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604100834436_RemoveCityId.resx">
+      <DependentUpon>201604100834436_RemoveCityId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

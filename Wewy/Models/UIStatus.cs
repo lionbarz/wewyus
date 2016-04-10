@@ -17,7 +17,9 @@ namespace Wewy.Models
         public DateTime DateCreatedLocal { get; set; }
         public DateTime? DateModifiedUtc { get; set; }
         public DateTime? DateModifiedLocal { get; set; }
-        public string CreatorCity { get; set; }
+        // Location of the creator when creating this status.
+        public string City { get; set; }
+        public string Country { get; set; }
         // True if the status was created by the viewing user.
         public bool IsCreatedByUser { get; set; }
         public List<UIStatusView> Views { get; set; }

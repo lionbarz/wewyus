@@ -12,11 +12,13 @@ namespace Wewy.Models
         public int StatusViewId { get; set; }
         public int StatusId { get; set; }
         public string ViewerId { get; set; }
-        public int CityId { get; set; }
         public DateTime LocalTime { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 
         public virtual Status Status { get; set; }
         public virtual ApplicationUser Viewer { get; set; }
-        public virtual City City { get; set; }
     }
 }

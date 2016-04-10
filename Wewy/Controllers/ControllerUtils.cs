@@ -44,15 +44,20 @@ namespace Wewy.Controllers
             foreach (ApplicationUser viewer in group.Members)
             {
                 // Calculate user's local time.
-                var tz = TimeZoneInfo.FindSystemTimeZoneById(viewer.CurrentCity.UserTimeZone.WindowsRegistryName);
-                DateTimeOffset userLocalDateOffset = utcOffset.ToOffset(tz.GetUtcOffset(utcOffset));
+                TimeSpan offset = new TimeSpan(
+                    seconds: 0,
+                    minutes: viewer.TimezoneOffsetMinutes,
+                    hours: 0);
+                DateTimeOffset userLocalDateOffset = utcOffset.ToOffset(offset);
 
                 views.Add(new StatusView()
                 {
                     ViewerId = viewer.Id,
                     Viewer = viewer,
-                    City = viewer.CurrentCity,
-                    CityId = viewer.CurrentCityId,
+                    City = viewer.City,
+                    Country = viewer.Country,
+                    Latitude = viewer.Latitude,
+                    Longitude = viewer.Longitude,
                     LocalTime = userLocalDateOffset.DateTime,
                     Status = status,
                     StatusId = status.StatusId
@@ -68,7 +73,8 @@ namespace Wewy.Controllers
                 v => new UIStatusView()
                 {
                     ViewerName = v.Viewer.Nickname,
-                    CityName = v.City.Name,
+                    City = v.City,
+                    Country = v.Country,
                     ViewTimeLocal = v.LocalTime
                 }).ToList();
         }

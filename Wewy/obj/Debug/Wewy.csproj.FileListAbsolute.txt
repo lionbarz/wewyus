@@ -80,3 +80,5 @@ C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.GroupAdmins.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.TimeZone.resources
 C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.GroupVisits.resources
+C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.AutoTimezone.resources
+C:\Users\Mohamed\Documents\Visual Studio 2015\Projects\Wewy\Wewy\obj\Debug\Wewy.Migrations.RemoveCityId.resources

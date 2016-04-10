@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -80,9 +79,9 @@ namespace Wewy.Controllers
                     {
                         Id = x.Id,
                         Name = x.Nickname,
-                        CityName = x.CurrentCity.Name,
+                        City = x.City,
                         Email = x.Email,
-                        TimeZoneName = x.CurrentCity.UserTimeZone.JavascriptName
+                        TimezoneOffsetMinutes = x.TimezoneOffsetMinutes
                     }).ToList()
             };
 

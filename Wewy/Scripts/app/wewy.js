@@ -34,33 +34,6 @@ app.config(['$routeProvider',
 
 app.controller('EditUserCtrl', function ($scope, $http, $window) {
 
-    $scope.cities = [];
-    $scope.userCity = "";
-    $scope.isSaving = false;
-    $scope.alert = "Loading...";
-
-    $http.get("/api/City").success(function (data, status, headers, config) {
-        $scope.alert = "";
-        $scope.cities = data.cityNames;
-        $scope.cityName = data.userCityName;
-    }).error(function (data, status, headers, config) {
-        $scope.alert = "Oops... something went wrong";
-        $scope.working = false;
-    });
-
-    $scope.save = function () {
-        mixpanel.track("Change city");
-        $scope.isSaving = true;
-        $scope.alert = "Saving...";
-        $http.put("/api/User", { "cityName": $scope.cityName }).success(function (data, status, headers, config) {
-            $scope.alert = "Saved."
-            $scope.isSaving = false;
-        }).error(function (data, status, headers, config) {
-            $scope.isSaving = false;
-            $scope.alert = "Oops... something went wrong";
-            $scope.working = false;
-        });
-    };
 });
 
 app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
@@ -90,11 +63,19 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.submitNewStatus = function () {
         mixpanel.track("Post new status");
         var text = $scope.newStatusText;
+
         if (!text) {
             return;
         }
+
+        var requestBody = {
+            "text": text,
+            "position": $scope.position,
+            "TimezoneOffsetMinutes": -(new Date).getTimezoneOffset()
+        };
+
         $scope.isSendingStatus = true;
-        $http.post("/api/Status?groupId=" + $scope.groupId, { "text": text }).success(function (data, status, headers, config) {
+        $http.post("/api/Status?groupId=" + $scope.groupId, requestBody).success(function (data, status, headers, config) {
             $scope.statuses.unshift(data);
             $scope.newStatusText = "";
             $scope.updateTimes();
@@ -124,7 +105,13 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
 
             for (j in status.views) {
                 var view = status.views[j];
-                status.formattedDates.push(moment(view.viewTimeLocal).format(formatString) + " (" + view.cityName + ", " + view.viewerName + ")");
+                var loc = null;
+                if (view.city) {
+                    loc = "(" + view.city + ", " + view.viewerName + ")";
+                } else {
+                    loc = "(" + view.viewerName + ")";
+                }
+                status.formattedDates.push(moment(view.viewTimeLocal).format(formatString) + " " + loc);
                 status.dateIndex = 0;
             }
         }
@@ -186,10 +173,10 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     $scope.updateUserTime = function () {
-        var now = moment();
+        var now = moment.utc();
 
         for (var member of $scope.group.members) {
-            var memberTime = now.tz(member.timeZoneName);
+            var memberTime = now.utcOffset(member.timezoneOffsetMinutes);
             member.day = memberTime.format("ddd, MMM Do");
             member.time = memberTime.format("h:mm a");
         }
@@ -225,6 +212,20 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
         }
     }
 
+    $scope.storePosition = function (geo) {
+        $scope.position = { "latitude": geo.coords.latitude, "longitude": geo.coords.longitude };
+    }
+
+    $scope.positionError = function (err) {
+        $scope.alert = err.code;
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition($scope.storePosition, $scope.positionError);
+    } else {
+        $scope.alert = "Your browser doesn't support geolocation. Use a newer browser!";
+    }
+
     $scope.getGroupData();
     $interval($scope.updateRelativeStatusTimes, 60000);
 });
@@ -247,7 +248,14 @@ app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParam
         mixpanel.track("Edit status");
         $scope.isSaving = true;
         $scope.alert = "Saving...";
-        $http.put("/api/Status?id=" + $routeParams.statusId, { "text": $scope.newStatusText }).success(function (data, status, headers, config) {
+
+        var requestBody = {
+            "text": $scope.newStatusText,
+            "position": $scope.position,
+            "timezoneOffset": - (new Date).getTimezoneOffset()
+        };
+
+        $http.put("/api/Status?id=" + $routeParams.statusId, requestBody).success(function (data, status, headers, config) {
             $scope.alert = "Saved.";
             $scope.isSaving = false;
             $window.history.back();

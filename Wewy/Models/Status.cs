@@ -15,14 +15,16 @@ namespace Wewy.Models
         public DateTime? DateModifiedLocal { get; set; }
         public string CreatorId { get; set; }
         public int GroupId { get; set; }
-        public int CreatorCityId { get; set; }
         public string Text { get; set; }
+        // Location info for the creator.
+        public string City { get; set; }
+        public string Country { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 
         [InverseProperty("Statuses")]
         public virtual Group Group { get; set; }
         public virtual ApplicationUser Creator { get; set; }
-        [ForeignKey("CreatorCityId")]
-        public virtual City CreatorCity { get; set; }
         public virtual List<StatusView> StatusViews { get; set; }
     }
 }

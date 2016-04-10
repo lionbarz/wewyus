@@ -32,8 +32,7 @@ namespace Wewy.Controllers
                 Id = appUser.Id,
                 Name = appUser.Nickname,
                 Email = appUser.Email,
-                CityName = appUser.CurrentCity.Name,
-                TimeZoneName = appUser.CurrentCity.UserTimeZone.JavascriptName
+                City = appUser.City
             };
 
             return Ok(user);
@@ -62,59 +61,11 @@ namespace Wewy.Controllers
                 Id = appUser.Id,
                 Name = appUser.Nickname,
                 Email = appUser.Email,
-                CityName = appUser.CurrentCity.Name,
-                TimeZoneName = appUser.CurrentCity.UserTimeZone.JavascriptName
+                City = appUser.City,
+                TimezoneOffsetMinutes = appUser.TimezoneOffsetMinutes
             };
 
             return Ok(user);
-        }
-
-        // Currently just for changing the city.
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutUser(UIUser modifiedUser)
-        {
-            City city = null;
-
-            if (modifiedUser.CityName != null)
-            {
-                city = await db.Cities
-                    .Where(c => c.Name == modifiedUser.CityName)
-                    .Select(c => c)
-                    .FirstOrDefaultAsync();
-            }
-            
-            string userId = User.Identity.GetUserId();
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            ApplicationUser updatedUser = new ApplicationUser()
-            {
-                Id = userId,
-                CurrentCity = city,
-                CurrentCityId = city.CityId,
-                UserName = User.Identity.GetUserName()
-            };
-            
-            db.Users.Attach(updatedUser);
-            var entry = db.Entry(updatedUser);
-            if (city != null)
-            {
-                entry.Property(e => e.CurrentCityId).IsModified = true;
-            }
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbEntityValidationException e)
-            {
-                return InternalServerError(e);
-            }
-
-            return Ok();
         }
     }
 }

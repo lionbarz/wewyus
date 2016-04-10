@@ -16,6 +16,18 @@ namespace Wewy.Models
 
         public string Nickname { get; set; }
 
+        // Last known time zone offset in minutes.
+        // For GMT+2 it would be 120.
+        public int TimezoneOffsetMinutes { get; set; }
+
+        public double Longitude { get; set; }
+
+        public double Latitude { get; set; }
+
+        public string City { get; set; }
+
+        public string Country { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -31,13 +43,8 @@ namespace Wewy.Models
         public virtual List<Group> GroupsAdministering { get; set; }
         
         [InverseProperty("Creator")]
-        public virtual List<Status> CreatedStatuses { get; set; }
-
-        public int CurrentCityId { get; set; }
-
-        [ForeignKey("CurrentCityId")]
-        public virtual City CurrentCity { get; set; }
-
+        public virtual List<Status> CreatedStatuses { get; set; }  
+    
         [InverseProperty("Visitor")]
         public virtual List<LastGroupVisit> LastGroupVisits { get; set; }
     }
@@ -63,10 +70,6 @@ namespace Wewy.Models
         public DbSet<Group> Groups { get; set; }
 
         public DbSet<Status> Status { get; set; }
-
-        public DbSet<UserTimeZone> UserTimeZones { get; set; }
-
-        public DbSet<City> Cities { get; set; }
 
         public DbSet<LastGroupVisit> LastGroupVisits { get; set; }
     }

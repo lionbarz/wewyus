@@ -81,7 +81,7 @@ namespace Wewy.Controllers
                     DateModifiedLocal = s.DateModifiedLocal,
                     Text = s.Text,
                     IsRtl = ControllerUtils.IsRtl(s.Text),
-                    CreatorCity = s.CreatorCity.Name,
+                    City = s.City,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName),
                     Views = ControllerUtils.GetUIViews(s.StatusViews)
                 }).ToArray();
@@ -153,7 +153,7 @@ namespace Wewy.Controllers
                     DateModifiedLocal = s.DateModifiedLocal,
                     Text = s.Text,
                     IsRtl = ControllerUtils.IsRtl(s.Text),
-                    CreatorCity = s.CreatorCity.Name,
+                    City = s.City,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName),
                     Views = ControllerUtils.GetUIViews(s.StatusViews)
                 }).ToArray();
@@ -164,7 +164,7 @@ namespace Wewy.Controllers
         // PUT: api/Status
         // Right now we only allow editing the text.
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutStatus(int id, UIStatus uiStatus)
+        public async Task<IHttpActionResult> PutStatus(int id, UIStatusPost uiStatusPost)
         {
             string userId = User.Identity.GetUserId();
 
@@ -184,8 +184,11 @@ namespace Wewy.Controllers
 
             DateTime utc = DateTime.UtcNow;
             DateTimeOffset dateUtcOffset = new DateTimeOffset(utc, TimeSpan.Zero);
-            var tz = TimeZoneInfo.FindSystemTimeZoneById(applicationUser.CurrentCity.UserTimeZone.WindowsRegistryName);
-            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(tz.GetUtcOffset(dateUtcOffset));
+            TimeSpan offset = new TimeSpan(
+                hours: 0,
+                minutes: -uiStatusPost.TimezoneOffsetMinutes, // Negative sign is important.
+                seconds: 0);
+            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(offset);
             DateTime localTime = userLocalDateOffset.DateTime;
 
             if (status.Creator.Id != userId)
@@ -193,7 +196,7 @@ namespace Wewy.Controllers
                 return Unauthorized();
             }
 
-            status.Text = uiStatus.Text;
+            status.Text = uiStatusPost.Text;
             status.DateModifiedUtc = utc;
             status.DateModifiedLocal = localTime;
             db.Status.Attach(status);
@@ -223,7 +226,7 @@ namespace Wewy.Controllers
 
         // POST: api/Status
         [ResponseType(typeof(UIStatus))]
-        public async Task<IHttpActionResult> PostStatus(int groupId, UIStatus uiStatus)
+        public async Task<IHttpActionResult> PostStatus(int groupId, UIStatusPost uiStatusPost)
         {
             string userId = User.Identity.GetUserId();
 
@@ -240,41 +243,62 @@ namespace Wewy.Controllers
             }
 
             ApplicationUser applicationUser = db.Users.Find(userId);
-
+            
             DateTime utc = DateTime.UtcNow;
             DateTimeOffset dateUtcOffset = new DateTimeOffset(utc, TimeSpan.Zero);
-            var tz = TimeZoneInfo.FindSystemTimeZoneById(applicationUser.CurrentCity.UserTimeZone.WindowsRegistryName);
-            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(tz.GetUtcOffset(dateUtcOffset));
+            TimeSpan offset = new TimeSpan(
+                hours: 0,
+                minutes: uiStatusPost.TimezoneOffsetMinutes,
+                seconds: 0);
+            DateTimeOffset userLocalDateOffset = dateUtcOffset.ToOffset(offset);
             DateTime localTime = userLocalDateOffset.DateTime;
+
+            // Update user's location.
+            LocationService.UpdateUserLocation(
+                db,
+                applicationUser,
+                uiStatusPost.Position,
+                uiStatusPost.TimezoneOffsetMinutes);
 
             Status status = new Status()
             {
                 CreatorId = User.Identity.GetUserId(),
                 GroupId = group.GroupId,
-                Text = uiStatus.Text,
+                Text = uiStatusPost.Text,
                 DateCreatedUtc = utc,
                 DateCreatedLocal = localTime,
-                CreatorCityId = applicationUser.CurrentCity.CityId,
                 Creator = applicationUser,
-                CreatorCity = applicationUser.CurrentCity,
+                City = applicationUser.City,
+                Country = applicationUser.Country,
+                Latitude = applicationUser.Latitude,
+                Longitude = applicationUser.Longitude,
                 Group = group,
             };
             
             status.StatusViews = ControllerUtils.MakeStatusViews(userId, group, status, utc);
 
             db.Status.Add(status);
+            db.Users.Attach(applicationUser);
+            var entry = db.Entry(applicationUser);
+            entry.Property(e => e.Latitude).IsModified = true;
+            entry.Property(e => e.Longitude).IsModified = true;
+            entry.Property(e => e.TimezoneOffsetMinutes).IsModified = true;
+            entry.Property(e => e.City).IsModified = true;
+            entry.Property(e => e.Country).IsModified = true;
             await db.SaveChangesAsync();
 
+            UIStatus uiStatus = new UIStatus();
             uiStatus.Id = status.StatusId;
             uiStatus.DateCreatedUtc = status.DateCreatedUtc;
             uiStatus.DateCreatedLocal = status.DateCreatedLocal;
-            uiStatus.CreatorCity = status.CreatorCity.Name;
             uiStatus.CreatorName = status.Creator.Nickname;
             uiStatus.CreatorId = status.Creator.Id;
             uiStatus.IsCreatedByUser = true;
-            uiStatus.IsRtl = ControllerUtils.IsRtl(uiStatus.Text);
+            uiStatus.IsRtl = ControllerUtils.IsRtl(uiStatusPost.Text);
             uiStatus.Views = ControllerUtils.GetUIViews(status.StatusViews);
             uiStatus.Text = status.Text;
+            uiStatus.City = status.City;
+            uiStatus.Country = status.Country;
 
             return Ok(uiStatus);
         }

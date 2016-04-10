@@ -12,8 +12,8 @@ namespace Wewy.Models
         public string Email { get; set; }
 
         [Required]
-        [Display(Name = "Hometown")]
-        public int HometownId { get; set; }
+        [Display(Name = "TimezoneOffsetMinutes")]
+        public int TimezoneOffsetMinutes { get; set; }
 
         [Required]
         [Display(Name = "Nickname")]
@@ -91,8 +91,8 @@ namespace Wewy.Models
         public string ConfirmPassword { get; set; }
 
         [Required]
-        [Display(Name = "Hometown")]
-        public int HometownId { get; set; }
+        [Display(Name = "TimezoneOffsetMinutes")]
+        public int TimezoneOffsetMinutes { get; set; }
 
         [Required]
         [Display(Name = "Nickname")]

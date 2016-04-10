@@ -9,6 +9,7 @@ namespace Wewy.Models
     {
         public string ViewerName { get; set; }
         public DateTime ViewTimeLocal { get; set; }
-        public string CityName { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
     }
 }
