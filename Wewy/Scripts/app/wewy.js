@@ -237,6 +237,7 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     if (navigator.geolocation) {
+        $scope.alert = "Looking for your location...";
         navigator.geolocation.getCurrentPosition($scope.storePosition, $scope.positionError);
     } else {
         $scope.warning = "Your browser doesn't support geolocation. Use a newer browser!";
