@@ -4,7 +4,14 @@
             <div class="col-xs-12">
                 <a ng-href="/#/EditGroup/{{group.id}}"><h3>{{group.name}}</h3></a>
             </div>
-            <div class="alert alert-info" role="alert" ng-show="alert">{{alert}}</div>
+            <div class="alert alert-info" role="alert" ng-show="alert">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{alert}}
+            </div>
+            <div class="alert alert-warning" role="alert" ng-show="warning">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> {{warning}}
+            </div>
         </div>
         <div class="row user-row" ng-style="{ 'border-color' : member.color }" ng-repeat="member in group.members" ng-click="reload()">
             <div class="col-sm-3 col-xs-6 user-name-col">{{member.name}}</div>
