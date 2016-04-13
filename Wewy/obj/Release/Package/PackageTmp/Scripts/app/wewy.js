@@ -213,17 +213,34 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     $scope.storePosition = function (geo) {
+        $scope.alert = "Successfully got your location!";
         $scope.position = { "latitude": geo.coords.latitude, "longitude": geo.coords.longitude };
     }
 
-    $scope.positionError = function (err) {
-        $scope.alert = err.code;
+    $scope.positionError = function (error) {
+        var message = "";
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                message = "You denied the request for geolocation."
+                break;
+            case error.POSITION_UNAVAILABLE:
+                message = "Your location information is unavailable."
+                break;
+            case error.TIMEOUT:
+                message = "The request to get your location timed out."
+                break;
+            case error.UNKNOWN_ERROR:
+                message = "An unknown error occurred with geolocation."
+                break;
+        }
+        $scope.warning = message;
     }
 
     if (navigator.geolocation) {
+        $scope.alert = "Looking for your location...";
         navigator.geolocation.getCurrentPosition($scope.storePosition, $scope.positionError);
     } else {
-        $scope.alert = "Your browser doesn't support geolocation. Use a newer browser!";
+        $scope.warning = "Your browser doesn't support geolocation. Use a newer browser!";
     }
 
     $scope.getGroupData();

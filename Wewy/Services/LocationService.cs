@@ -73,24 +73,36 @@ namespace Wewy.Services
                 return null;
             }
 
-            GoogleReverseGeocodeAddressComponent adminArea1Component = result
-                .Results[0]
-                .Address_Components
-                .Where(x => x.Types.Any(t => t.Equals("administrative_area_level_1")))
-                .FirstOrDefault();
+            GoogleReverseGeocodeAddressComponent cityComponent = TryGetComponent(result, "neighborhood");
+
+            if (cityComponent == null)
+            {
+                cityComponent = TryGetComponent(result, "locality");
+            }
+
+            if (cityComponent == null)
+            {
+                cityComponent = TryGetComponent(result, "administrative_area_level_3");
+            }
+
+            if (cityComponent == null)
+            {
+                cityComponent = TryGetComponent(result, "administrative_area_level_2");
+            }
+
+            if (cityComponent == null)
+            {
+                cityComponent = TryGetComponent(result, "administrative_area_level_1");
+            }
 
             string city = null;
 
-            if (adminArea1Component != null)
+            if (cityComponent != null)
             {
-                city = adminArea1Component.Long_Name;
+                city = cityComponent.Long_Name;
             }
 
-            GoogleReverseGeocodeAddressComponent countryComponent = result
-                .Results[0]
-                .Address_Components
-                .Where(x => x.Types.Any(t => t.Equals("country")))
-                .FirstOrDefault();
+            GoogleReverseGeocodeAddressComponent countryComponent = TryGetComponent(result, "country");
 
             string country = null;
 
@@ -110,6 +122,15 @@ namespace Wewy.Services
                 City = city,
                 Country = country
             };
+        }
+
+        private static GoogleReverseGeocodeAddressComponent TryGetComponent(GoogleReverseGeocodeResult result, string type)
+        {
+            return result
+                .Results[0]
+                .Address_Components
+                .Where(x => x.Types.Any(t => t.Equals(type)))
+                .FirstOrDefault();
         }
 
         public static void UpdateUserLocation(
