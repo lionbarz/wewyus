@@ -75,6 +75,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.alert = "Oops... something went wrong";
+            $timeout($scope.getGroupData, 60000);
         });
     };
 
@@ -184,6 +185,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.warning = "Oops... couldn't get group info.";
+            $timeout($scope.getGroupData, 60000);
         });
     }
 

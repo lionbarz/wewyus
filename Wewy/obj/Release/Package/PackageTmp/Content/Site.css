@@ -150,6 +150,15 @@
     font-weight: bold;
 }
 
+.status-update-time-row {
+    text-align: center;
+    font-size: smaller;
+}
+
+.submit-status-btn {
+    width: 100%;
+}
+
 /* Not designed for larger screen sizes!*/
 @media screen and (min-width: 620px) {
     .status-container {

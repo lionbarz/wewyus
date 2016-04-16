@@ -36,7 +36,7 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
 
 });
 
-app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
+app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
     var dad = 1;
     $scope.isSendingStatus = false;
     $scope.isLoading = true;
@@ -46,17 +46,36 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     $scope.loverUserData = null;
     $scope.groupId = $routeParams.groupId;
 
+    // When the statuses were last refreshed here in the client.
+    $scope.statusesLastUpdateDate = null;
+    $scope.statusesLastUpdateText = "never";
+
+    $scope.updateStatusesLastUpdateText = function () {
+        $timeout($scope.updateStatusesLastUpdateText, 10000);
+
+        if (!$scope.statusesLastUpdateDate) {
+            $scope.statusesLastUpdateText = "never";
+        } else {
+            var mom = moment($scope.statusesLastUpdateDate)
+            $scope.statusesLastUpdateText = mom.fromNow();
+        }
+    }
+
     $scope.reload = function () {
         mixpanel.track("Reload group");
         $scope.isLoading = true;
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.statuses = data;
+            $scope.statusesLastUpdateDate = new Date();
+            $scope.statusesLastUpdateText = "just now";
             $scope.colorStatuses();
             $scope.updateTimes();
+            $timeout($scope.getGroupData, 60000);
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
             $scope.alert = "Oops... something went wrong";
+            $timeout($scope.getGroupData, 60000);
         });
     };
 
@@ -119,12 +138,15 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
 
     $scope.updateRelativeStatusTimes = function () {
         var status, mom, fromNow;
+
         for (i in $scope.statuses) {
             status = $scope.statuses[i];
             mom = moment(status.dateCreatedUtc + "Z");
             fromNow = mom.fromNow();
             status.formattedDates[0] = fromNow;
         }
+
+        $timeout($scope.updateRelativeStatusTimes, 60000);
     }
 
     $scope.changeSort = function () {
@@ -158,28 +180,32 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
             $scope.group = data;
             $scope.assignMemberColors();
             $scope.hashMembersById();
-            $scope.updateUserTime();
-            $interval($scope.updateUserTime, 10000);
+            $scope.updateUserTime(false);
             $scope.reload();
         }).error(function (data, status, headers, config) {
             $scope.isLoading = false;
-            if (status == 500) {
-                $scope.alert = "Oops... something went wrong.";
-            }
-            else {
-                $scope.alert = "The group doesn't exist or you don't have access.";
-            }
+            $scope.warning = "Oops... couldn't get group info.";
+            $timeout($scope.getGroupData, 60000);
         });
     }
 
-    $scope.updateUserTime = function () {
+    $scope.updateUserTime = function (schedule) {
         var now = moment.utc();
+
+        if (schedule) {
+            $timeout(function () { $scope.updateUserTime(true) }, 60000);
+        }
+
+        if (!$scope.group || !$scope.group.members)
+        {
+            return;
+        }
 
         for (var member of $scope.group.members) {
             var memberTime = now.utcOffset(member.timezoneOffsetMinutes);
             member.day = memberTime.format("ddd, MMM Do");
             member.time = memberTime.format("h:mm a");
-        }
+        }    
     }
 
     $scope.assignMemberColors = function () {
@@ -244,7 +270,9 @@ app.controller('GroupCtrl', function ($scope, $http, $interval, $routeParams) {
     }
 
     $scope.getGroupData();
-    $interval($scope.updateRelativeStatusTimes, 60000);
+    $scope.updateRelativeStatusTimes();
+    $scope.updateUserTime(true);
+    $scope.updateStatusesLastUpdateText();
 });
 
 app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParams, $window) {
