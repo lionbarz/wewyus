@@ -23,13 +23,16 @@
             <div class="col-xs-12">
                 <div class="new-status-box" ng-hide="isSendingStatus || !group || !group.members">
                     <form ng-submit="submitNewStatus()">
-                        <div class="input-group">
-                            <input class="form-control" type="text" ng-model="newStatusText" placeholder="What am I doing?" />
-                            <div class="input-group-btn">
-                                <button class="btn btn-default" type="submit">Ya2</button>
-                            </div>
+                        <div>
+                            <textarea class="form-control" rows="3" ng-model="newStatusText" placeholder="What am I doing?" ></textarea>
+                            <button class="btn btn-default submit-status-btn" type="submit">Ya2</button>
                         </div>
                     </form>
+                </div>
+                <div class="row status-update-time-row">
+                    <div class="col-xs-12">
+                        Updated {{statusesLastUpdateText}}
+                    </div>
                 </div>
                 <div class="send-status-box text-center" ng-show="isSendingStatus">
                     Sending...

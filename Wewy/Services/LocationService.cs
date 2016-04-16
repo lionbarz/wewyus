@@ -73,12 +73,7 @@ namespace Wewy.Services
                 return null;
             }
 
-            GoogleReverseGeocodeAddressComponent cityComponent = TryGetComponent(result, "neighborhood");
-
-            if (cityComponent == null)
-            {
-                cityComponent = TryGetComponent(result, "locality");
-            }
+            GoogleReverseGeocodeAddressComponent cityComponent = TryGetComponent(result, "locality"); ;
 
             if (cityComponent == null)
             {
