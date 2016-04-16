@@ -36,10 +36,9 @@ app.controller('EditUserCtrl', function ($scope, $http, $window) {
 
 });
 
-app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
+app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $log) {
     var dad = 1;
     $scope.isSendingStatus = false;
-    $scope.isLoading = true;
     $scope.displayMyStatuses = true;
     $scope.displaySortByDay = false;
     $scope.myUserData = null;
@@ -50,8 +49,10 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
     $scope.statusesLastUpdateDate = null;
     $scope.statusesLastUpdateText = "never";
 
-    $scope.updateStatusesLastUpdateText = function () {
-        $timeout($scope.updateStatusesLastUpdateText, 10000);
+    $scope.updateStatusesLastUpdateText = function (schedule) {
+        if (schedule) {
+            $timeout(function () { $scope.updateStatusesLastUpdateText(true) }, 10000);
+        }
 
         if (!$scope.statusesLastUpdateDate) {
             $scope.statusesLastUpdateText = "never";
@@ -63,18 +64,18 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
 
     $scope.reload = function () {
         mixpanel.track("Reload group");
-        $scope.isLoading = true;
+        $scope.statusesLastUpdateText = "Refreshing...";
         $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
-            $scope.isLoading = false;
             $scope.statuses = data;
             $scope.statusesLastUpdateDate = new Date();
             $scope.statusesLastUpdateText = "just now";
+            $log.debug("Updated statuses: " + $scope.statusesLastUpdateDate);
             $scope.colorStatuses();
             $scope.updateTimes();
             $timeout($scope.getGroupData, 60000);
         }).error(function (data, status, headers, config) {
-            $scope.isLoading = false;
-            $scope.alert = "Oops... something went wrong";
+            $scope.warning = "Failed to load statuses.";
+            $scope.updateStatusesLastUpdateText(false);
             $timeout($scope.getGroupData, 60000);
         });
     };
@@ -175,15 +176,14 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
     }
 
     $scope.getGroupData = function () {
-        $scope.isLoading = true;
         $http.get("/api/Group?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
             $scope.group = data;
             $scope.assignMemberColors();
             $scope.hashMembersById();
             $scope.updateUserTime(false);
+            $log.debug("Updated group: " + $scope.statusesLastUpdateDate);
             $scope.reload();
         }).error(function (data, status, headers, config) {
-            $scope.isLoading = false;
             $scope.warning = "Oops... couldn't get group info.";
             $timeout($scope.getGroupData, 60000);
         });
@@ -272,7 +272,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams) {
     $scope.getGroupData();
     $scope.updateRelativeStatusTimes();
     $scope.updateUserTime(true);
-    $scope.updateStatusesLastUpdateText();
+    $scope.updateStatusesLastUpdateText(true);
 });
 
 app.controller('EditStatusCtrl', function ($scope, $http, $interval, $routeParams, $window) {

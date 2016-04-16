@@ -21,10 +21,10 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <div class="new-status-box" ng-hide="isSendingStatus || !group || !group.members">
+                <div class="new-status-box" ng-hide="!group || !group.members">
                     <form ng-submit="submitNewStatus()">
                         <div>
-                            <textarea class="form-control" rows="3" ng-model="newStatusText" placeholder="What am I doing?" ></textarea>
+                            <textarea class="form-control" rows="3" ng-model="newStatusText" placeholder="What am I doing?" ng-disabled="isSendingStatus" ></textarea>
                             <button class="btn btn-default submit-status-btn" type="submit">Ya2</button>
                         </div>
                     </form>
@@ -36,9 +36,6 @@
                 </div>
                 <div class="send-status-box text-center" ng-show="isSendingStatus">
                     Sending...
-                </div>
-                <div class="reload-status-box text-center" ng-show="isLoading">
-                    Loading...
                 </div>
                 <div class="status-box" ng-style="{ 'border-bottom-color': status.color }" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
                     <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
