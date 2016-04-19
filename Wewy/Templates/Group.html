@@ -25,7 +25,7 @@
                     <form ng-submit="submitNewStatus()">
                         <div>
                             <textarea class="form-control" rows="3" ng-model="newStatusText" placeholder="What am I doing?" ng-disabled="isSendingStatus" ></textarea>
-                            <button class="btn btn-default submit-status-btn" type="submit">Ya2</button>
+                            <button class="btn btn-default submit-status-btn" type="submit" ng-disabled="isSendingStatus" >Ya2</button>
                         </div>
                     </form>
                 </div>

@@ -88,15 +88,18 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             return;
         }
 
+        $scope.isSendingStatus = true;
+
         var requestBody = {
             "text": text,
             "position": $scope.position,
             "TimezoneOffsetMinutes": -(new Date).getTimezoneOffset()
         };
 
-        $scope.isSendingStatus = true;
-        $http.post("/api/Status?groupId=" + $scope.groupId, requestBody).success(function (data, status, headers, config) {
-            $scope.statuses.unshift(data);
+        var url = "/api/Status?groupId=" + $scope.groupId;
+
+        $http.post(url, requestBody).success(function (newStatus, status, headers, config) {
+            $scope.statuses.unshift(newStatus);
             $scope.newStatusText = "";
             $scope.updateTimes();
             $scope.isSendingStatus = false;
