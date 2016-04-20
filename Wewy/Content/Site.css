@@ -159,10 +159,24 @@
     width: 100%;
 }
 
+.landing-page-info {
+    padding: 4%;
+}
+
+.landing-page-icon {
+    margin-right: 10px;
+}
+
 /* Not designed for larger screen sizes!*/
 @media screen and (min-width: 620px) {
     .status-container {
         width: 600px;
         margin: auto;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .landing-page-icon {
+        display: none;
     }
 }

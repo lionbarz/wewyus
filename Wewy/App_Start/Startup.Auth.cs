@@ -10,6 +10,7 @@ using Microsoft.Owin.Security.OAuth;
 using Owin;
 using Wewy.Models;
 using Wewy.Providers;
+using Wewy.Common;
 
 namespace Wewy
 {
@@ -46,7 +47,7 @@ namespace Wewy
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString("/Account/Login"),
+                LoginPath = new PathString("/Account/Register"),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.
@@ -80,8 +81,8 @@ namespace Wewy
             //    consumerSecret: "");
 
             app.UseFacebookAuthentication(
-                appId: "1563131274010031",
-                appSecret: "338d861179d402b1c7200876b7fcd79d");
+                appId: WewyConstants.FACEBOOK_APP_ID,
+                appSecret: WewyConstants.FACEBOOK_APP_SECRET);
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{

@@ -38,7 +38,7 @@ namespace Wewy.Services
                 "latlng={0},{1}&key={2}",
                 position.Latitude,
                 position.Longitude,
-                Constants.GOOGLE_MAPS_API_KEY);
+                WewyConstants.GOOGLE_MAPS_API_KEY);
             WebRequest request = WebRequest.Create(uri.Uri);
             // Get the response.
             WebResponse response = request.GetResponse();
