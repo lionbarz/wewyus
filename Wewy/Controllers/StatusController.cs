@@ -45,6 +45,13 @@ namespace Wewy.Controllers
         [ResponseType(typeof(UIStatus[]))]
         public async Task<IHttpActionResult> GetStatuses(int groupId)
         {
+            return await GetStatuses(groupId, new DateTime(0));
+        }
+
+        // GET: api/Status
+        [ResponseType(typeof(UIStatus[]))]
+        public async Task<IHttpActionResult> GetStatuses(int groupId, DateTime sinceWhen)
+        {
             string userId = User.Identity.GetUserId();
             ApplicationUser me = db.Users.Find(userId);
 
@@ -63,7 +70,7 @@ namespace Wewy.Controllers
             string myName = User.Identity.GetUserName();
 
             var statuses = await db.Status
-                .Where(s => s.GroupId == group.GroupId)
+                .Where(s => s.GroupId == group.GroupId && s.DateCreatedUtc > sinceWhen)
                 .Select(s => s)
                 .OrderByDescending(s => s.DateCreatedUtc)
                 .Take(QueryPageSize)
@@ -107,56 +114,6 @@ namespace Wewy.Controllers
                 db.Entry(lastVisit).Property(x => x.VisitTimeUtc).IsModified = true;
                 await db.SaveChangesAsync();
             }
-
-            return Ok(uiStatuses);
-        }
-
-        // GET: api/Status
-        [ResponseType(typeof(UIStatus[]))]
-        public async Task<IHttpActionResult> GetStatuses(int groupId, string date)
-        {
-            DateTime target = DateTime.Parse(date);
-            DateTime targetPlusDay = target.AddDays(1);
-
-            string userId = User.Identity.GetUserId();
-
-            Group group = await db.Groups.FindAsync(groupId);
-
-            if (group == null)
-            {
-                return BadRequest(string.Format("Group {0} doesn't exit.", groupId));
-            }
-
-            if (!group.Members.Any(x => x.Id.Equals(userId)))
-            {
-                return BadRequest("You're not in this group.");
-            }
-
-            string myName = User.Identity.GetUserName();
-
-            var statuses = await db.Status
-                .Where(s => s.GroupId == group.GroupId && s.DateCreatedLocal > target && s.DateCreatedLocal < targetPlusDay)
-                .Select(s => s)
-                .OrderByDescending(s => s.DateCreatedLocal)
-                .Take(QueryPageSize)
-                .ToListAsync();
-
-            UIStatus[] uiStatuses = statuses.Select(
-                s => new UIStatus()
-                {
-                    Id = s.StatusId,
-                    CreatorName = s.Creator.Nickname,
-                    CreatorId = s.Creator.Id,
-                    DateCreatedUtc = s.DateCreatedUtc,
-                    DateCreatedLocal = s.DateCreatedLocal,
-                    DateModifiedUtc = s.DateModifiedUtc,
-                    DateModifiedLocal = s.DateModifiedLocal,
-                    Text = s.Text,
-                    IsRtl = ControllerUtils.IsRtl(s.Text),
-                    City = s.City,
-                    IsCreatedByUser = s.Creator.UserName.Equals(myName),
-                    Views = ControllerUtils.GetUIStatusViews(s.StatusViews)
-                }).ToArray();
 
             return Ok(uiStatuses);
         }

@@ -44,6 +44,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
     $scope.myUserData = null;
     $scope.loverUserData = null;
     $scope.groupId = $routeParams.groupId;
+    $scope.latestStatusDateUtc = null;
 
     // When the statuses were last refreshed here in the client.
     $scope.statusesLastUpdateDate = null;
@@ -65,8 +66,48 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
     $scope.reload = function () {
         mixpanel.track("Reload group");
         $scope.statusesLastUpdateText = "Refreshing...";
-        $http.get("/api/Status?groupId=" + $scope.groupId).success(function (data, status, headers, config) {
-            $scope.statuses = data;
+        var url = "/api/Status?groupId=" + $scope.groupId;
+        
+        if ($scope.latestStatusDateUtc) {
+            // Get only since the date of the last status.
+            url += "&sinceWhen=" + $scope.latestStatusDateUtc;
+        }
+
+        $http.get(url).success(function (data, status, headers, config) {
+            var isPartialUpdate = $scope.latestStatusDateUtc !== null;
+            if (data.length > 0) {
+                // They are ordered by date created UTC descending on the server side.
+                $scope.latestStatusDateUtc = data[0].dateCreatedUtc;
+            }
+            if (isPartialUpdate) {
+                // This is an update, not cumulative.
+                // Merge while de-duping.
+                var oldStatuses = $scope.statuses;
+                $scope.statuses = []
+                while (data.length > 0 || oldStatuses.length > 0) {
+                    if (data.length > 0 && oldStatuses.length > 0) {
+                        if (data[data.length - 1].id === oldStatuses[oldStatuses.length - 1].id) {
+                            $scope.statuses.unshift(data.pop());
+                            oldStatuses.pop();
+                        }
+                        else if (data[data.length - 1].dateCreatedUtc < oldStatuses[oldStatuses.length - 1].dateCreatedUtc)
+                        {
+                            $scope.statuses.unshift(data.pop());
+                        }
+                        else {
+                            $scope.statuses.unshift(oldStatuses.pop());
+                        }
+                    } else if (data.length > 0) {
+                        Array.prototype.unshift.apply($scope.statuses, data);
+                        data = [];
+                    } else {
+                        Array.prototype.unshift.apply($scope.statuses, oldStatuses);
+                        oldStatuses = [];
+                    }
+                }
+            } else {
+                $scope.statuses = data;
+            }
             $scope.statusesLastUpdateDate = new Date();
             $scope.statusesLastUpdateText = "just now";
             $log.debug("Updated statuses: " + $scope.statusesLastUpdateDate);
@@ -108,6 +149,12 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             $scope.isSendingStatus = false;
             $scope.alert = "Oops... something went wrong";
         });
+    };
+
+    $scope.bumpDateIndex = function (status) {
+        status.dateIndex = status.dateIndex || 0;
+        status.dateIndex = (status.dateIndex + 1) % status.formattedDates.length;
+        mixpanel.track('Toggle status time');
     };
 
     $scope.updateTimes = function () {
