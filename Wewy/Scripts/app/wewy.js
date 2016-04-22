@@ -86,22 +86,22 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
                 $scope.statuses = []
                 while (data.length > 0 || oldStatuses.length > 0) {
                     if (data.length > 0 && oldStatuses.length > 0) {
-                        if (data[data.length - 1].id === oldStatuses[oldStatuses.length - 1].id) {
-                            $scope.statuses.unshift(data.pop());
-                            oldStatuses.pop();
+                        if (data[0].id === oldStatuses[0].id) {
+                            $scope.statuses.push(data.shift());
+                            oldStatuses.shift();
                         }
-                        else if (data[data.length - 1].dateCreatedUtc < oldStatuses[oldStatuses.length - 1].dateCreatedUtc)
+                        else if (data[0].dateCreatedUtc > oldStatuses[0].dateCreatedUtc)
                         {
-                            $scope.statuses.unshift(data.pop());
+                            $scope.statuses.push(data.shift());
                         }
                         else {
-                            $scope.statuses.unshift(oldStatuses.pop());
+                            $scope.statuses.push(oldStatuses.shift());
                         }
                     } else if (data.length > 0) {
-                        Array.prototype.unshift.apply($scope.statuses, data);
+                        Array.prototype.push.apply($scope.statuses, data);
                         data = [];
                     } else {
-                        Array.prototype.unshift.apply($scope.statuses, oldStatuses);
+                        Array.prototype.push.apply($scope.statuses, oldStatuses);
                         oldStatuses = [];
                     }
                 }
