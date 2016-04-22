@@ -126,18 +126,28 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             fromNow = mom.fromNow();
             status.formattedDates = [fromNow];
 
+            // Author's time is always at index 1.
+            var authorText = $scope.postTimeToString(status.dateCreatedLocal, status.city, status.country, status.creatorName, formatString);
+            status.formattedDates.push(authorText);
+
             for (j in status.views) {
                 var view = status.views[j];
-                var loc = null;
-                if (view.city) {
-                    loc = "(" + view.city + ", " + view.viewerName + ")";
-                } else {
-                    loc = "(" + view.viewerName + ")";
-                }
-                status.formattedDates.push(moment(view.viewTimeLocal).format(formatString) + " " + loc);
-                status.dateIndex = 0;
+                var text = $scope.postTimeToString(view.viewTimeLocal, view.city, view.country, view.viewerName, formatString);
+                status.formattedDates.push(text);
             }
         }
+    };
+
+    $scope.postTimeToString = function (localTime, city, country, name, formatString) {
+        var loc = null;
+        if (city) {
+            loc = "(" + city + ", " + name + ")";
+        } else if (country) {
+            loc = "(" + country + ", " + name + ")";
+        } else {
+            loc = "(" + name + ")";
+        }
+        return moment(localTime).format(formatString) + " " + loc;
     };
 
     $scope.updateRelativeStatusTimes = function () {

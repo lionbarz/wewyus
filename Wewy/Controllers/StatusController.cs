@@ -83,7 +83,7 @@ namespace Wewy.Controllers
                     IsRtl = ControllerUtils.IsRtl(s.Text),
                     City = s.City,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName),
-                    Views = ControllerUtils.GetUIViews(s.StatusViews)
+                    Views = ControllerUtils.GetUIStatusViews(s.StatusViews)
                 }).ToArray();
 
             // Record group visit.
@@ -155,7 +155,7 @@ namespace Wewy.Controllers
                     IsRtl = ControllerUtils.IsRtl(s.Text),
                     City = s.City,
                     IsCreatedByUser = s.Creator.UserName.Equals(myName),
-                    Views = ControllerUtils.GetUIViews(s.StatusViews)
+                    Views = ControllerUtils.GetUIStatusViews(s.StatusViews)
                 }).ToArray();
 
             return Ok(uiStatuses);
@@ -295,7 +295,7 @@ namespace Wewy.Controllers
             uiStatus.CreatorId = status.Creator.Id;
             uiStatus.IsCreatedByUser = true;
             uiStatus.IsRtl = ControllerUtils.IsRtl(uiStatusPost.Text);
-            uiStatus.Views = ControllerUtils.GetUIViews(status.StatusViews);
+            uiStatus.Views = ControllerUtils.GetUIStatusViews(status.StatusViews);
             uiStatus.Text = status.Text;
             uiStatus.City = status.City;
             uiStatus.Country = status.Country;
