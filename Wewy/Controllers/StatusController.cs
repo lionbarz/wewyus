@@ -222,7 +222,6 @@ namespace Wewy.Controllers
 
             // Update user's location.
             LocationService.UpdateUserLocation(
-                db,
                 applicationUser,
                 uiStatusPost.Position,
                 uiStatusPost.TimezoneOffsetMinutes);

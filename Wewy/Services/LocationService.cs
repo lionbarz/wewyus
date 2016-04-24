@@ -129,7 +129,6 @@ namespace Wewy.Services
         }
 
         public static void UpdateUserLocation(
-            ApplicationDbContext context,
             ApplicationUser user,
             Position position,
             int timezoneOffsetMinutes)
@@ -137,27 +136,17 @@ namespace Wewy.Services
             if (position == null)
             {
                 // We don't know where the dude is.
-                // If it's the same offset as the last time, just keep the last position.
-                if (user.TimezoneOffsetMinutes == timezoneOffsetMinutes)
-                {
-                    // Nothing to do here.
-                    return;
-                }
-                else
-                {
-                    // Dude is in new time zone but we don't know his position.
-                    // Overwrite the stale position data.
-                    user.TimezoneOffsetMinutes = timezoneOffsetMinutes;
-                    user.Latitude = 0.0;
-                    user.Longitude = 0.0;
-                    user.City = null;
-                    user.Country = null;
-                }
+                // Overwrite the stale position data.
+                user.TimezoneOffsetMinutes = timezoneOffsetMinutes;
+                user.Latitude = 0.0;
+                user.Longitude = 0.0;
+                user.City = null;
+                user.Country = null;
             }
             else
             {
                 user.Latitude = position.Latitude;
-                user.Longitude = position.Longitude;       
+                user.Longitude = position.Longitude;
 
                 Location location = ReverseGeocode(position);
 
