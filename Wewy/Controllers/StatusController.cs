@@ -48,6 +48,16 @@ namespace Wewy.Controllers
             return await GetStatuses(groupId, new DateTime(0));
         }
 
+        /// <summary>
+        /// Get statuses for a group.
+        /// </summary>
+        /// <param name="groupId">The group to which the statuses belong.</param>
+        /// <param name="sinceWhen">The time constraint.</param>
+        /// <returns>
+        /// Returns one page size of statuses that belong to the group and that
+        /// were created strictly after the given timestamp and in descending order
+        /// according to their creation date.
+        /// </returns>
         // GET: api/Status
         [ResponseType(typeof(UIStatus[]))]
         public async Task<IHttpActionResult> GetStatuses(int groupId, DateTime sinceWhen)

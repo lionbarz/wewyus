@@ -81,32 +81,20 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             }
             if (isPartialUpdate) {
                 // This is an update, not cumulative.
-                // Merge while de-duping.
-                var oldStatuses = $scope.statuses;
-                $scope.statuses = []
-                while (data.length > 0 || oldStatuses.length > 0) {
-                    if (data.length > 0 && oldStatuses.length > 0) {
-                        if (data[0].id === oldStatuses[0].id) {
-                            $scope.statuses.push(data.shift());
-                            oldStatuses.shift();
-                        }
-                        else if (data[0].dateCreatedUtc > oldStatuses[0].dateCreatedUtc)
-                        {
-                            $scope.statuses.push(data.shift());
-                        }
-                        else {
-                            $scope.statuses.push(oldStatuses.shift());
-                        }
-                    } else if (data.length > 0) {
-                        Array.prototype.push.apply($scope.statuses, data);
-                        data = [];
-                    } else {
-                        Array.prototype.push.apply($scope.statuses, oldStatuses);
-                        oldStatuses = [];
+                // Prepend ones that are unique (not displayed already).
+                for (var i = data.length - 1; i >= 0; i--) {
+                    var s = data[i];
+                    if ($scope.statusIdToStatus[s.id] === undefined) {
+                        $scope.statuses.unshift(s);
+                        $scope.statusIdToStatus[s.id] = s;
                     }
                 }
             } else {
                 $scope.statuses = data;
+                $scope.statusIdToStatus = [];
+                $scope.statuses.forEach(function (s) {
+                    $scope.statusIdToStatus[s.id] = s;
+                });
             }
             $scope.statusesLastUpdateDate = new Date();
             $scope.statusesLastUpdateText = "just now";
@@ -141,6 +129,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
 
         $http.post(url, requestBody).success(function (newStatus, status, headers, config) {
             $scope.statuses.unshift(newStatus);
+            $scope.statusIdToStatus[newStatus.id] = newStatus;
             $scope.newStatusText = "";
             $scope.updateTimes();
             $scope.isSendingStatus = false;
