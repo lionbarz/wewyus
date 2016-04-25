@@ -29,6 +29,13 @@
                         </div>
                     </form>
                 </div>
+                <div class="btn-group">
+                    <select class="form-control" id="selTimestampType" ng-model="statusDateTypeSelection" ng-change="updateDisplayDate(statuses)">
+                        <option value="show-relative">Show how long ago</option>
+                        <option value="show-author">Show author's local time</option>
+                        <option value="show-all">Show all times</option>
+                    </select>
+                </div>
                 <div class="row status-update-time-row">
                     <div class="col-xs-12">
                         Updated {{statusesLastUpdateText}}
@@ -39,11 +46,18 @@
                 </div>
                 <div class="status-box" ng-style="{ 'border-bottom-color': status.color }" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
                     <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
-                        <div class="status-creator-name">{{status.creatorName}}</div>
-                        <div class="status-date" ng-click="bumpDateIndex(status)">
-                            {{status.formattedDates[status.dateIndex || 0]}}
+                        <div class="status-creator-name">
+                            {{status.creatorName}}
                         </div>
-                        <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">{{status.text}}</div>
+                        <div class="status-date" ng-hide="statusDateTypeSelection === 'show-all'">
+                            {{status.displayDate}}
+                        </div>
+                        <div class="status-date" ng-repeat="formattedDate in status.formattedDates track by $index" ng-show="statusDateTypeSelection === 'show-all'">
+                            {{formattedDate}}
+                        </div>
+                        <div ng-class="{'status-text': true, 'my-status-text': status.isCreatedByUser}">
+                            {{status.text}}
+                        </div>
                         <div class="status-edit-menu" ng-show="status.isCreatedByUser">
                             <a ng-href="/#EditStatus/{{status.id}}">Edit</a>
                         </div>

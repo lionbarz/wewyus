@@ -45,6 +45,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
     $scope.loverUserData = null;
     $scope.groupId = $routeParams.groupId;
     $scope.latestStatusDateUtc = null;
+    $scope.statusDateTypeSelection = "show-relative";
 
     // When the statuses were last refreshed here in the client.
     $scope.statusesLastUpdateDate = null;
@@ -100,7 +101,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             $scope.statusesLastUpdateText = "just now";
             $log.debug("Updated statuses: " + $scope.statusesLastUpdateDate);
             $scope.colorStatuses();
-            $scope.updateTimes();
+            $scope.updateTimes($scope.statuses);
             $timeout($scope.getGroupData, 60000);
         }).error(function (data, status, headers, config) {
             $scope.warning = "Failed to load statuses.";
@@ -131,7 +132,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             $scope.statuses.unshift(newStatus);
             $scope.statusIdToStatus[newStatus.id] = newStatus;
             $scope.newStatusText = "";
-            $scope.updateTimes();
+            $scope.updateTimes([newStatus]);
             $scope.isSendingStatus = false;
             $scope.colorStatuses();
         }).error(function (data, status, headers, config) {
@@ -146,7 +147,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
         mixpanel.track('Toggle status time');
     };
 
-    $scope.updateTimes = function () {
+    $scope.updateTimes = function (statuses) {
         var status,
             mom,
             fromNow,
@@ -155,9 +156,9 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
 
         var formatString = "ddd, MMM Do, h:mm a";
 
-        for (i in $scope.statuses)
+        for (i in statuses)
         {
-            status = $scope.statuses[i];
+            status = statuses[i];
             mom = moment(status.dateCreatedUtc + "Z"); 
             fromNow = mom.fromNow();
             status.formattedDates = [fromNow];
@@ -171,6 +172,8 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
                 var text = $scope.postTimeToString(view.viewTimeLocal, view.city, view.country, view.viewerName, formatString);
                 status.formattedDates.push(text);
             }
+
+            $scope.updateDisplayDate([status]);
         }
     };
 
@@ -186,6 +189,16 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
         return moment(localTime).format(formatString) + " " + loc;
     };
 
+    $scope.updateDisplayDate = function (statuses) {
+        statuses.forEach(function (status) {
+            if ($scope.statusDateTypeSelection === "show-relative") {
+                status.displayDate = status.formattedDates[0];
+            } else if ($scope.statusDateTypeSelection === "show-author") {
+                status.displayDate = status.formattedDates[1];
+            }
+        });
+    }
+
     $scope.updateRelativeStatusTimes = function () {
         var status, mom, fromNow;
 
@@ -194,6 +207,11 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             mom = moment(status.dateCreatedUtc + "Z");
             fromNow = mom.fromNow();
             status.formattedDates[0] = fromNow;
+
+            if ($scope.statusDateTypeSelection === "show-relative" ||
+                $scope.statusDateTypeSelection === "show-all") {
+                $scope.updateDisplayDate([status]);
+            }
         }
 
         $timeout($scope.updateRelativeStatusTimes, 60000);
