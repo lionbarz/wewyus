@@ -45,7 +45,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
     $scope.loverUserData = null;
     $scope.groupId = $routeParams.groupId;
     $scope.latestStatusDateUtc = null;
-    $scope.statusDateTypeSelection = "show-relative";
+    $scope.statusDateTypeSelection = "show-all";
 
     // When the statuses were last refreshed here in the client.
     $scope.statusesLastUpdateDate = null;
@@ -154,7 +154,7 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
             dateLocalToCreator,
             dateLocalToLover;
 
-        var formatString = "ddd, MMM Do, h:mm a";
+        var formatString = "h:mm a";
 
         for (i in statuses)
         {
@@ -180,11 +180,11 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
     $scope.postTimeToString = function (localTime, city, country, name, formatString) {
         var loc = null;
         if (city) {
-            loc = "(" + city + ", " + name + ")";
+            loc = city + " @ " + name;
         } else if (country) {
-            loc = "(" + country + ", " + name + ")";
+            loc = country + " @ " + name;
         } else {
-            loc = "(" + name + ")";
+            loc = " @ " + name;
         }
         return moment(localTime).format(formatString) + " " + loc;
     };
@@ -269,10 +269,25 @@ app.controller('GroupCtrl', function ($scope, $http, $timeout, $routeParams, $lo
         }
 
         for (var member of $scope.group.members) {
-            var memberTime = now.utcOffset(member.timezoneOffsetMinutes);
-            member.day = memberTime.format("ddd, MMM Do");
+            var memberTime = now.utcOffset(member.timezoneOffsetMinutes);         
             member.time = memberTime.format("h:mm a");
-        }    
+
+            var intMemberDay = parseInt(memberTime.format("DD"));
+            var intToday = parseInt(now.format("DD"));
+            
+            if (intMemberDay === intToday)
+            {
+                member.day = "Today";
+            }
+            else if (intMemberDay < intToday)
+            {
+                member.day = "Yesterday";
+            }
+            else
+            {
+                member.day = "Tomorrow";
+            }
+        }
     }
 
     $scope.assignMemberColors = function () {

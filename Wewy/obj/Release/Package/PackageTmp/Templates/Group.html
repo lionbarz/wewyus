@@ -1,7 +1,7 @@
 ﻿<section id="content">
     <div class="container status-container">
         <div class="row group-name-row">
-            <div class="col-xs-12">
+            <div class="col-xs-12 group-name-col">
                 <a ng-href="/#/EditGroup/{{group.id}}"><h3>{{group.name}}</h3></a>
             </div>
             <div class="alert alert-info" role="alert" ng-show="alert">
@@ -13,11 +13,8 @@
                 <strong>Warning!</strong> {{warning}}
             </div>
         </div>
-        <div class="row user-row" ng-style="{ 'border-color' : member.color }" ng-repeat="member in group.members" ng-click="reload()">
-            <div class="col-sm-3 col-xs-6 user-name-col">{{member.name}}</div>
-            <div class="col-sm-3 col-xs-6 user-day-col">{{member.day}}</div>
-            <div class="col-sm-3 col-xs-6 user-time-col">{{member.time}}</div>
-            <div class="col-sm-3 col-xs-6 user-city-col">{{member.city}}</div>
+        <div class="row" ng-repeat="member in group.members" ng-click="reload()">
+            <div class="col-xs-12"><span class="user-name-col" ng-style="{ 'color' : member.color }">{{member.name}}</span> | <span class="time-location-col">{{member.time}} {{member.city}}</span></div>
         </div>
         <div class="row">
             <div class="col-xs-12">
@@ -29,7 +26,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="btn-group">
+                <div class="btn-group" ng-hide="true">
                     <select class="form-control" id="selTimestampType" ng-model="statusDateTypeSelection" ng-change="updateDisplayDate(statuses)">
                         <option value="show-relative">Show how long ago</option>
                         <option value="show-author">Show author's local time</option>
@@ -46,7 +43,7 @@
                 </div>
                 <div class="status-box" ng-style="{ 'border-bottom-color': status.color }" ng-repeat="status in statuses" ng-show="!status.isCreatedByUser || displayMyStatuses">
                     <div dir="{{status.isRtl ? 'rtl' : 'ltr'}}">
-                        <div class="status-creator-name">
+                        <div class="status-creator-name" ng-style="{ 'color' : status.color }">
                             {{status.creatorName}}
                         </div>
                         <div class="status-date" ng-hide="statusDateTypeSelection === 'show-all'">

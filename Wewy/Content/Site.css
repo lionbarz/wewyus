@@ -42,6 +42,7 @@
 
 .new-status-box {
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .my-status-text {
@@ -77,18 +78,16 @@
     background-repeat: no-repeat;
 }
 
-.group-name-row {
-    margin-bottom: 10px;
-}
-
-.user-row {
-    margin-bottom: 10px;
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-}
-
 .user-name-col {
     font-weight: bold;
+}
+
+.time-location-col {
+    font-size: smaller;
+}
+
+.group-name-col {
+    text-align: center;
 }
 
 .user-city-info p {
